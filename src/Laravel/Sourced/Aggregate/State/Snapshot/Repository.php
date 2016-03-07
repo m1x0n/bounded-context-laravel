@@ -18,10 +18,11 @@ class Repository extends AbstractQueryable implements \BoundedContext\Contracts\
         $this->state_snapshot_factory = $state_snapshot_factory;
     }
 
-    public function id(Identifier $id)
+    public function ids(Identifier $aggregate_id, Identifier $aggregate_type_id)
     {
         $snapshot_row = $this->query()
-            ->where('id', $id->serialize())
+            ->where('aggregate_id', $aggregate_id->serialize())
+            ->where('aggregate_type_id', $aggregate_type_id->serialize())
             ->first()
         ;
 
@@ -43,9 +44,10 @@ class Repository extends AbstractQueryable implements \BoundedContext\Contracts\
     {
         $this->query()->getConnection()->statement(
           'INSERT INTO ' . $this->table .
-          ' (id, occurred_at, version, state) ' .
+          ' (aggreate_id, aggregate_type_id, occurred_at, version, state) ' .
             'VALUES( '
                 . '\'' . $snapshot->id()->serialize() . '\','
+                . '\'' . $snapshot->type_id()->serialize() . '\','
                 . '\'' . $snapshot->occurred_at()->serialize() . '\','
                 . '\'' . $snapshot->version()->serialize() . '\','
                 . '\'' . json_encode($snapshot->schema()->serialize()) . '\'' .
