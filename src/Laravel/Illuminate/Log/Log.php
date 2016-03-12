@@ -1,6 +1,6 @@
 <?php namespace BoundedContext\Laravel\Illuminate\Log;
 
-use BoundedContext\Contracts\Event\Event;
+use BoundedContext\Contracts\Core\Loggable;
 use BoundedContext\Contracts\Event\Snapshot\Factory;
 use BoundedContext\Contracts\Sourced\Stream\Builder;
 use Illuminate\Database\DatabaseManager;
@@ -53,26 +53,25 @@ class Log implements \BoundedContext\Contracts\Sourced\Log\Log
             ->delete();
     }
 
-    public function append(Event $event)
+    public function append(Loggable $loggable)
     {
-        $snapshot = $this->event_snapshot_factory->event($event);
+        $snapshot = $this->event_snapshot_factory->loggable($loggable);
 
         $id = $this->connection->table($this->table)->insertGetId(array(
             'snapshot' => json_encode($snapshot->serialize())
         ));
-
         $this->connection->table($this->stream_table)->insert([
             'log_id' => $id,
             'log_snapshot_id' => $snapshot->id()->serialize(),
             'aggregate_id' => $snapshot->schema()->id,
+            'aggregate_type_id' => $loggable->aggregate_type_id()->serialize(),
             'version' => $snapshot->version()->serialize(),
         ]);
     }
 
     public function append_collection(CollectionContract $snapshots)
     {
-        foreach($snapshots as $snapshot)
-        {
+        foreach ($snapshots as $snapshot) {
             $this->append($snapshot);
         }
     }

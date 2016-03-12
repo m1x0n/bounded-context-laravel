@@ -305,5 +305,10 @@ class BoundedContextProvider extends ServiceProvider
             'BoundedContext\Contracts\Projection\Factory',
             'BoundedContext\Laravel\Illuminate\Projection\Factory'
         );
+        
+        $this->app->bind(
+            'BoundedContext\Contracts\Sourced\Aggregate\TypeId\Factory',
+            'BoundedContext\Sourced\Aggregate\TypeId\Factory'
+        );
     }
 }

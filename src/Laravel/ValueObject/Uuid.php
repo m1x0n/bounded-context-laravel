@@ -22,6 +22,11 @@ class Uuid extends AbstractValueObject implements Identifier
     {
         return $this->uuid->toString();
     }
+    
+    public function value()
+    {
+        return $this->uuid->toString();
+    }
 
     public static function deserialize($uuid = null)
     {

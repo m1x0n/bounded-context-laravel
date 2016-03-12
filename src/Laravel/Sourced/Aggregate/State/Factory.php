@@ -11,7 +11,9 @@ class Factory implements \BoundedContext\Contracts\Sourced\Aggregate\State\Facto
     protected $state_class;
     protected $state_projection_class;
 
-    public function __construct(Deserializer $deserializer)
+    public function __construct(
+        Deserializer $deserializer
+    )
     {
         $this->deserializer = $deserializer;
     }
@@ -28,13 +30,12 @@ class Factory implements \BoundedContext\Contracts\Sourced\Aggregate\State\Facto
         return $this;
     }
 
-    private function parse_doc_comment(\ReflectionProperty $property)
+    private function parse_doc_comment(string $doc_comment)
     {
-        $doc_comment = $property->getDocComment();
-        $doc_comment = trim(preg_replace('/\r?\n *\* *\//', '', $doc_comment));
+        $clean_doc_comment = trim(preg_replace('/\r?\n *\* *\//', '', $doc_comment));
 
         $comments = [];
-        preg_match_all('/@([a-z]+)\s+(.*?)\s*(?=$|@[a-z]+\s)/s', $doc_comment, $comments);
+        preg_match_all('/@([a-z]+)\s+(.*?)\s*(?=$|@[a-z]+\s)/s', $clean_doc_comment, $comments);
 
         return array_combine($comments[1], $comments[2]);
     }
@@ -49,7 +50,8 @@ class Factory implements \BoundedContext\Contracts\Sourced\Aggregate\State\Facto
         if($schema->serialize() == [])
         {
             return new $this->state_class(
-                $snapshot->id(),
+                $snapshot->aggregate_id(),
+                $snapshot->aggregate_type_id(),
                 $snapshot->version(),
                 $projection
             );
@@ -62,7 +64,7 @@ class Factory implements \BoundedContext\Contracts\Sourced\Aggregate\State\Facto
         $properties = $projection_object->getProperties();
         foreach ($properties as $property)
         {
-            $comment = $this->parse_doc_comment($property);
+            $comment = $this->parse_doc_comment($property->getDocComment());
 
             $property_class_name = $comment['var'];
             $property_name = $property->name;
@@ -119,7 +121,8 @@ class Factory implements \BoundedContext\Contracts\Sourced\Aggregate\State\Facto
         }
 
         return new $this->state_class(
-            $snapshot->id(),
+            $snapshot->aggregate_id(),
+            $snapshot->aggregate_type_id(),
             $snapshot->version(),
             $projection
         );

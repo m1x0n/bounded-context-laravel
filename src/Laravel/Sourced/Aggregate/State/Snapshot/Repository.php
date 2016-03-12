@@ -26,17 +26,16 @@ class Repository extends AbstractQueryable implements \BoundedContext\Contracts\
             ->first()
         ;
 
-        $snapshot_row = (array) $snapshot_row;
+        $snapshot_array = (array) $snapshot_row;
 
-        if(!$snapshot_row)
-        {
-            return $this->state_snapshot_factory->create($id);
+        if (!$snapshot_array) {
+            return $this->state_snapshot_factory->create($aggregate_id, $aggregate_type_id);
         }
 
-        $snapshot_row['state'] = json_decode($snapshot_row['state'], true);
+        $snapshot_array['state'] = json_decode($snapshot_array['state'], true);
 
         return $this->state_snapshot_factory->tree(
-            $snapshot_row
+            $snapshot_array
         );
     }
 
@@ -44,10 +43,10 @@ class Repository extends AbstractQueryable implements \BoundedContext\Contracts\
     {
         $this->query()->getConnection()->statement(
           'INSERT INTO ' . $this->table .
-          ' (aggreate_id, aggregate_type_id, occurred_at, version, state) ' .
+          ' (aggregate_id, aggregate_type_id, occurred_at, version, state) ' .
             'VALUES( '
-                . '\'' . $snapshot->id()->serialize() . '\','
-                . '\'' . $snapshot->type_id()->serialize() . '\','
+                . '\'' . $snapshot->aggregate_id()->value() . '\','
+                . '\'' . $snapshot->aggregate_type_id()->value() . '\','
                 . '\'' . $snapshot->occurred_at()->serialize() . '\','
                 . '\'' . $snapshot->version()->serialize() . '\','
                 . '\'' . json_encode($snapshot->schema()->serialize()) . '\'' .

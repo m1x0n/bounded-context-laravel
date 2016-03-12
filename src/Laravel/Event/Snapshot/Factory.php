@@ -1,6 +1,6 @@
 <?php namespace BoundedContext\Laravel\Event\Snapshot;
 
-use BoundedContext\Contracts\Event\Event;
+use BoundedContext\Contracts\Core\Loggable;
 use BoundedContext\Event\Snapshot\Snapshot;
 use BoundedContext\Contracts\Event\Version\Factory as EventVersionFactory;
 use BoundedContext\Contracts\Generator\DateTime;
@@ -30,14 +30,14 @@ class Factory implements \BoundedContext\Contracts\Event\Snapshot\Factory
         $this->event_map = $event_map;
     }
 
-    public function event(Event $event)
+    public function loggable(Loggable $loggable)
     {
         return new Snapshot(
             $this->identifier_generator->generate(),
-            $this->event_version_factory->event($event),
+            $this->event_version_factory->loggable($loggable),
             $this->datetime_generator->now(),
-            $this->event_map->get_id($event),
-            new Schema($event->serialize())
+            $this->event_map->get_id($loggable),
+            new Schema($loggable->serialize())
         );
     }
 

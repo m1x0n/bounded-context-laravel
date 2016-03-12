@@ -1,6 +1,6 @@
 <?php namespace BoundedContext\Laravel\Event\Version;
 
-use BoundedContext\Contracts\Event\Event;
+use BoundedContext\Contracts\Core\Loggable;
 use BoundedContext\Contracts\Generator\DateTime;
 use BoundedContext\Contracts\Generator\Identifier;
 use BoundedContext\Map\Map;
@@ -24,14 +24,14 @@ class Factory implements \BoundedContext\Contracts\Event\Version\Factory
         $this->event_map = $event_map;
     }
 
-    public function event(Event $event)
+    public function loggable(Loggable $loggable)
     {
-        $event_class = get_class($event);
+        $loggable_class = get_class($loggable);
 
         $upgrader_class = preg_replace(
             array('/Command/', '/Event/'),
             array('Upgrader\\Command', 'Upgrader\\Event'),
-            $event_class
+            $loggable_class
         );
 
         $upgrader = new $upgrader_class(new Schema(), new Integer_());
