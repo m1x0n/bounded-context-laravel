@@ -13,11 +13,11 @@ use Illuminate\Database\ConnectionInterface;
 class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced\Stream\Stream
 {
     protected $connection;
-    protected $stream_table = 'event_snapshot_stream';
-    protected $log_table = 'event_snapshot_log';
+    protected $log_table = 'event_log';
 
     protected $starting_id;
     protected $last_id;
+    protected $order;
 
     public function __construct(
         ConnectionInterface $connection,
@@ -29,8 +29,9 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
     {
         $this->connection = $connection;
 
-        $this->starting_id = $starting_id;
-        $this->last_id = $starting_id;
+        $this->starting_id = $starting_id;        
+        
+        $this->configure_order();
 
         parent::__construct(
             $event_snapshot_factory,
@@ -38,39 +39,50 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
             $chunk_size
         );
     }
+    
+    private function configure_order()
+    {
+        if ($this->starting_id->is_null()) {
+            $this->order = -1;
+        } else {
+            $this->order = $this->get_order_of_id($this->starting_id);
+        }
+    }
+    
+    private function get_order_of_id(Identifier $id) 
+    {
+        $row = $this->connection
+            ->table($this->log_table)
+            ->select("$this->log_table.order")
+            ->where("id", "=", $this->uuid_to_binary($id))
+            ->first();
+        if (!$row) {
+            throw new \Exception("Cannot find log entry for ID '".$id->serialize()."'");
+        }
+        return $row->order;
+    }
+    
+    private function uuid_to_binary(Uuid $uuid)
+    {
+        $hex = str_replace("-", "", $uuid->value());
+        return hex2bin($hex);
+    }
 
     public function reset()
     {
-        $this->last_id = $this->starting_id;
-
+        $this->configure_order();
+        
         parent::reset();
     }
 
     private function get_next_chunk()
     {
         $query = $this->connection
-            ->table($this->stream_table)
+            ->table($this->log_table)
             ->select("$this->log_table.snapshot")
-            ->join(
-                $this->log_table,
-                "$this->stream_table.log_id",
-                '=',
-                "$this->log_table.id"
-            )
+            ->where("order", ">", $this->order)
             ->orderBy("$this->stream_table.id")
             ->limit($this->chunk_size->serialize());
-
-        if(!$this->last_id->is_null())
-        {
-            $query->whereRaw("
-                $this->stream_table.id >
-                    (
-                        SELECT id FROM `$this->stream_table`
-                        WHERE `$this->stream_table`.`log_snapshot_id` = '".$this->last_id->serialize()."'
-                    )
-                "
-            );
-        }
 
         $rows = $query->get();
 
@@ -83,8 +95,7 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
 
         $event_snapshot_schemas = $this->get_next_chunk();
 
-        foreach($event_snapshot_schemas as $event_snapshot_schema)
-        {
+        foreach ($event_snapshot_schemas as $event_snapshot_schema) {
             $event_snapshot = $this->event_snapshot_factory->schema(
                 new Schema(
                     json_decode(
@@ -95,7 +106,7 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
             );
 
             $this->event_snapshots->append($event_snapshot);
-            $this->last_id = $event_snapshot->id();
+            $this->order = $event_snapshot_schema->order;
         }
     }
 }

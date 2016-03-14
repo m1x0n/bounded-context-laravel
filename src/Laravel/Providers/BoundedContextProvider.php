@@ -114,16 +114,7 @@ class BoundedContextProvider extends ServiceProvider
             'BoundedContext\Sourced\Stream\Builder'
         );
 
-        $this->app->singleton('EventLog', function($app)
-        {
-            return new Log(
-                $this->app->make('BoundedContext\Contracts\Event\Snapshot\Factory'),
-                $this->app->make('BoundedContext\Contracts\Sourced\Stream\Builder'),
-                $this->app->make('db'),
-                'event_snapshot_log',
-                'event_snapshot_stream'
-            );
-        });
+        $this->app->singleton('EventLog', Illuminate\Log\Event::class);
 
         $this->app->singleton('CommandLog', function($app)
         {

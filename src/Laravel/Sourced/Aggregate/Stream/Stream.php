@@ -7,12 +7,12 @@ use BoundedContext\Schema\Schema;
 use BoundedContext\Sourced\Stream\AbstractStream;
 use BoundedContext\ValueObject\Integer as Integer_;
 use Illuminate\Database\ConnectionInterface;
+use BoundedContext\Laravel\ValueObject\Uuid;
 
 class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced\Stream\Stream
 {
     protected $connection;
-    protected $stream_table = 'event_snapshot_stream';
-    protected $log_table = 'event_snapshot_log';
+    protected $log_table = 'event_log';
 
     protected $aggregate_id;
     protected $aggregate_type_id;
@@ -55,23 +55,17 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
     private function get_next_chunk()
     {
         $query = $this->connection
-            ->table($this->stream_table)
-            ->select("$this->log_table.snapshot")
-            ->join(
-                $this->log_table,
-                "$this->stream_table.log_id",
-                '=',
-                "$this->log_table.id"
+            ->table($this->log_table)
+            ->select("snapshot")
+            ->where(
+                "aggregate_id",
+                $this->uuid_to_binary($this->aggregate_id)
             )
             ->where(
-                "$this->stream_table.aggregate_id",
-                $this->aggregate_id->value()
+                "aggregate_type_id",
+                $this->uuid_to_binary($this->aggregate_type_id)
             )
-            ->where(
-                "$this->stream_table.aggregate_type_id",
-                $this->aggregate_type_id->value()
-            )
-            ->orderBy("$this->stream_table.id")
+            ->orderBy("order")
             ->limit($this->chunk_size->serialize())
             ->offset($this->current_offset->serialize());
                 
@@ -101,5 +95,11 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
         $this->current_offset = $this->current_offset->add(
             $this->event_snapshots->count()
         );
+    }
+    
+    private function uuid_to_binary(Uuid $uuid)
+    {
+        $hex = str_replace("-", "", $uuid->value());
+        return hex2bin($hex);
     }
 }
