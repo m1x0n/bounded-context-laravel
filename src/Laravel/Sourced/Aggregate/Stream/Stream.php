@@ -7,11 +7,12 @@ use BoundedContext\Schema\Schema;
 use BoundedContext\Sourced\Stream\AbstractStream;
 use BoundedContext\ValueObject\Integer as Integer_;
 use Illuminate\Database\ConnectionInterface;
-use BoundedContext\Laravel\ValueObject\Uuid;
+use BoundedContext\Laravel\Illuminate\BinaryString;
 
 class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced\Stream\Stream
 {
     protected $connection;
+    protected $binary_string_factory;
     protected $log_table = 'event_log';
 
     protected $aggregate_id;
@@ -23,6 +24,7 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
     public function __construct(
         ConnectionInterface $connection,
         EventSnapshotFactory $event_snapshot_factory,
+        BinaryString\Factory $binary_string_factory,
         Identifier $aggregate_id,
         Identifier $aggregate_type_id,
         Integer_ $starting_offset,
@@ -31,6 +33,7 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
     )
     {
         $this->connection = $connection;
+        $this->binary_string_factory = $binary_string_factory;
 
         $this->aggregate_id = $aggregate_id;
         $this->aggregate_type_id = $aggregate_type_id;        
@@ -59,11 +62,11 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
             ->select("snapshot")
             ->where(
                 "aggregate_id",
-                $this->uuid_to_binary($this->aggregate_id)
+                $this->binary_string_factory->uuid($this->aggregate_id)
             )
             ->where(
                 "aggregate_type_id",
-                $this->uuid_to_binary($this->aggregate_type_id)
+                $this->binary_string_factory->uuid($this->aggregate_type_id)
             )
             ->orderBy("order")
             ->limit($this->chunk_size->serialize())
@@ -95,11 +98,5 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
         $this->current_offset = $this->current_offset->add(
             $this->event_snapshots->count()
         );
-    }
-    
-    private function uuid_to_binary(Uuid $uuid)
-    {
-        $hex = str_replace("-", "", $uuid->value());
-        return hex2bin($hex);
     }
 }

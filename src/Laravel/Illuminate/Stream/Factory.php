@@ -24,6 +24,7 @@ class Factory implements \BoundedContext\Contracts\Sourced\Stream\Factory
             [
                 $this->application->make('db')->connection(),
                 $this->application->make('BoundedContext\Laravel\Event\Snapshot\Factory'),
+                $this->application->make(\BoundedContext\Laravel\Illuminate\BinaryString\Factory::class),
                 $starting_id,
                 $limit,
                 $chunk_size

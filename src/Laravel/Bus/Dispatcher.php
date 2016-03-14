@@ -2,7 +2,7 @@
 
 use BoundedContext\Contracts\Collection\Collection;
 use BoundedContext\Contracts\Command\Command;
-use BoundedContext\Contracts\Sourced\Log\Log as CommandLog;
+use BoundedContext\Contracts\Sourced\Log\Command as CommandLog;
 use BoundedContext\Contracts\Sourced\Aggregate\Repository as AggregateRepository;
 
 use Illuminate\Database\Connection;

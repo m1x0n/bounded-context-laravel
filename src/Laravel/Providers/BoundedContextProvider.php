@@ -114,18 +114,9 @@ class BoundedContextProvider extends ServiceProvider
             'BoundedContext\Sourced\Stream\Builder'
         );
 
-        $this->app->singleton('EventLog', Illuminate\Log\Event::class);
+        $this->app->singleton(\BoundedContext\Contracts\Sourced\Log\Event::class, Illuminate\Log\Event::class);
 
-        $this->app->singleton('CommandLog', function($app)
-        {
-            return new Log(
-                $this->app->make('BoundedContext\Contracts\Event\Snapshot\Factory'),
-                $this->app->make('BoundedContext\Contracts\Sourced\Stream\Builder'),
-                $this->app->make('db'),
-                'command_snapshot_log',
-                'command_snapshot_stream'
-            );
-        });
+        $this->app->singleton(\BoundedContext\Contracts\Sourced\Log\Command::class, Illuminate\Log\Command::class);
 
         /**
          * Aggregates
@@ -150,11 +141,6 @@ class BoundedContextProvider extends ServiceProvider
             'BoundedContext\Contracts\Sourced\Aggregate\Factory',
             'BoundedContext\Laravel\Sourced\Aggregate\Factory'
         );
-
-        $this->app
-            ->when('BoundedContext\Sourced\Aggregate\Repository')
-            ->needs('BoundedContext\Contracts\Sourced\Log\Log')
-            ->give('EventLog');
 
         $this->app->bind(
             'BoundedContext\Contracts\Sourced\Aggregate\Repository',
@@ -261,11 +247,6 @@ class BoundedContextProvider extends ServiceProvider
         /**
          * General
          */
-
-        $this->app
-            ->when('BoundedContext\Laravel\Bus\Dispatcher')
-            ->needs('BoundedContext\Contracts\Sourced\Log\Log')
-            ->give('CommandLog');
 
         $this->app->bind(
             'BoundedContext\Contracts\Bus\Dispatcher',
