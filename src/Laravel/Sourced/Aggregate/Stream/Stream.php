@@ -1,9 +1,7 @@
 <?php namespace BoundedContext\Laravel\Sourced\Aggregate\Stream;
 
-use BoundedContext\Collection\Collection;
 use BoundedContext\Contracts\ValueObject\Identifier;
 use BoundedContext\Laravel\Event\Snapshot\Factory as EventSnapshotFactory;
-use BoundedContext\Schema\Schema;
 use BoundedContext\Sourced\Stream\AbstractStream;
 use BoundedContext\ValueObject\Integer as Integer_;
 use Illuminate\Database\ConnectionInterface;
@@ -11,15 +9,14 @@ use BoundedContext\Laravel\Illuminate\BinaryString;
 
 class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced\Stream\Stream
 {
-    protected $connection;
-    protected $binary_string_factory;
-    protected $log_table = 'event_log';
+    private $connection;
+    private $binary_string_factory;
 
-    protected $aggregate_id;
-    protected $aggregate_type_id;
+    private $aggregate_id;
+    private $aggregate_type_id;
 
-    protected $starting_offset;
-    protected $current_offset;
+    private $starting_offset;
+    private $current_offset;
 
     public function __construct(
         ConnectionInterface $connection,
@@ -55,7 +52,7 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
         parent::reset();
     }
 
-    private function get_next_chunk()
+    protected function get_next_chunk()
     {
         $query = $this->connection
             ->table($this->log_table)
@@ -77,26 +74,10 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
         return $rows;
     }
 
-    protected function fetch()
+    protected function set_offset(array $event_snapshot_rows)
     {
-        $this->event_snapshots = new Collection();
-
-        $event_snapshot_schemas = $this->get_next_chunk();
-
-        foreach ($event_snapshot_schemas as $event_snapshot_schema) {
-            $event_snapshot = $this->event_snapshot_factory->schema(
-                new Schema(
-                    json_decode(
-                        $event_snapshot_schema->snapshot,
-                        true
-                    )
-                )
-            );
-            $this->event_snapshots->append($event_snapshot);
-        }
-
         $this->current_offset = $this->current_offset->add(
-            $this->event_snapshots->count()
+            new Integer_(count($event_snapshot_rows))
         );
     }
 }

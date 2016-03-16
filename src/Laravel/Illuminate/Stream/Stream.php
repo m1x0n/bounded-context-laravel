@@ -1,9 +1,6 @@
 <?php namespace BoundedContext\Laravel\Illuminate\Stream;
 
 use BoundedContext\Contracts\ValueObject\Identifier;
-
-use BoundedContext\Collection\Collection;
-use BoundedContext\Schema\Schema;
 use BoundedContext\Sourced\Stream\AbstractStream;
 use BoundedContext\ValueObject\Integer as Integer_;
 
@@ -13,13 +10,11 @@ use BoundedContext\Laravel\Illuminate\BinaryString;
 
 class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced\Stream\Stream
 {
-    protected $connection;
-    protected $binary_string_factory;
-    protected $log_table = 'event_log';
+    private $connection;
+    private $binary_string_factory;
 
-    protected $starting_id;
-    protected $last_id;
-    protected $order;
+    private $starting_id;
+    private $order_offset;
 
     public function __construct(
         ConnectionInterface $connection,
@@ -47,15 +42,15 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
     public function reset()
     {
         if ($this->starting_id->is_null()) {
-            $this->order = -1;
+            $this->order_offset = -1;
         } else {
-            $this->order = null;
+            $this->order_offset = null;
         }
         
         parent::reset();
     }
 
-    private function get_next_chunk()
+    protected function get_next_chunk()
     {
         $query = $this->connection
             ->table($this->log_table)
@@ -63,7 +58,7 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
             ->orderBy("order")
             ->limit($this->chunk_size->serialize());
         
-        if (is_null($this->order)) {
+        if (is_null($this->order_offset)) {
             $query = $query->whereRaw("
                 `order` >
                     (
@@ -73,32 +68,20 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
                 "
             );
         } else {
-            $query = $query->where("order", ">", $this->order);
+            $query = $query->where("order", ">", $this->order_offset);
         }
 
         $rows = $query->get();
         
         return $rows;
     }
-
-    protected function fetch()
+    
+    protected function set_offset(array $event_snapshot_rows)
     {
-        $this->event_snapshots = new Collection();
-
-        $event_snapshot_schemas = $this->get_next_chunk();
-
-        foreach ($event_snapshot_schemas as $event_snapshot_schema) {
-            $event_snapshot = $this->event_snapshot_factory->schema(
-                new Schema(
-                    json_decode(
-                        $event_snapshot_schema->snapshot,
-                        true
-                    )
-                )
-            );
-
-            $this->event_snapshots->append($event_snapshot);
-            $this->order = $event_snapshot_schema->order;
-        }
+        if (count($event_snapshot_rows)) {
+            $last_element_index = count($event_snapshot_rows) - 1;
+            $last_in_collection = $event_snapshot_rows[$last_element_index];
+            $this->order_offset = $last_in_collection->order;
+        }        
     }
 }

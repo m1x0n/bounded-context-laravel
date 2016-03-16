@@ -51,16 +51,14 @@ class BoundedContextProvider extends ServiceProvider
         /**
          * Events
          */
-
-        $this->app->singleton('EventsMap', function($app)
-        {
+        $this->app->singleton('EventsMap', function($app) {
             $commands = (!Config::get('commands')) ? [] : Config::get('commands');
             $events = (!Config::get('events')) ? [] : Config::get('events');
 
-            $events = array_merge($commands, $events);
+            $map = array_merge($commands, $events);
 
             return new Map(
-                $events,
+                $map,
                 $this->app->make('BoundedContext\Contracts\Generator\Identifier')
             );
         });
@@ -173,15 +171,12 @@ class BoundedContextProvider extends ServiceProvider
 
         $projection_types = Config::get('projections');
 
-        if(is_null($projection_types))
-        {
+        if (is_null($projection_types)) {
             return;
         }
         
-        foreach($projection_types as $projection_type)
-        {
-            foreach($projection_type as $projection => $implemented_projection)
-            {
+        foreach ($projection_types as $projection_type) {
+            foreach ($projection_type as $projection => $implemented_projection) {
                 $queryable =
                     '\\' .
                     chop($projection, 'Projection') .
@@ -202,22 +197,17 @@ class BoundedContextProvider extends ServiceProvider
         }
 
         /* Players */
-        $this->app->singleton('PlayersMap', function($app)
-        {
+        $this->app->singleton('PlayersMap', function($app) {
             $player_environments = Config::get('players');
 
-            if(is_null($player_environments))
-            {
+            if(is_null($player_environments)) {
                 return;
             }
 
             $players_array = [];
-            foreach($player_environments as $player_environment)
-            {
-                foreach($player_environment as $player_types)
-                {
-                    foreach($player_types as $id => $player)
-                    {
+            foreach($player_environments as $player_environment) {
+                foreach($player_environment as $player_types) {
+                    foreach($player_types as $id => $player) {
                         $players_array[$id] = $player;
                     }
                 }
