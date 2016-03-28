@@ -1,7 +1,7 @@
 <?php namespace BoundedContext\Laravel\Illuminate\Stream;
 
-use BoundedContext\Contracts\ValueObject\Identifier;
-use BoundedContext\ValueObject\Integer as Integer_;
+use EventSourced\ValueObject\Contracts\ValueObject\Identifier;
+use EventSourced\ValueObject\ValueObject\Integer as Integer_;
 use Illuminate\Contracts\Foundation\Application;
 
 class Factory implements \BoundedContext\Contracts\Sourced\Stream\Factory

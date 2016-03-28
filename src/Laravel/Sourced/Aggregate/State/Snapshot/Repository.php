@@ -1,28 +1,34 @@
 <?php namespace BoundedContext\Laravel\Sourced\Aggregate\State\Snapshot;
 
-use BoundedContext\Contracts\ValueObject\Identifier;
+use EventSourced\ValueObject\Contracts\ValueObject\Identifier;
 use BoundedContext\Contracts\Sourced\Aggregate\State\Snapshot\Factory as StateSnapshotFactory;
 use BoundedContext\Contracts\Sourced\Aggregate\State\Snapshot\Snapshot;
 use BoundedContext\Laravel\Illuminate\Projection\AbstractQueryable;
 use Illuminate\Contracts\Foundation\Application;
+use EventSourced\ValueObject\Serializer\Serializer;
 
 class Repository extends AbstractQueryable implements \BoundedContext\Contracts\Sourced\Aggregate\State\Snapshot\Repository
 {
     protected $state_snapshot_factory;
     protected $table = 'snapshots_aggregate_state';
+    protected $serializer;
 
-    public function __construct(Application $app, StateSnapshotFactory $state_snapshot_factory)
+    public function __construct(
+        Application $app, 
+        StateSnapshotFactory $state_snapshot_factory,
+        Serializer $serializer)
     {
         parent::__construct($app);
 
         $this->state_snapshot_factory = $state_snapshot_factory;
+        $this->serializer = $serializer;
     }
 
     public function ids(Identifier $aggregate_id, Identifier $aggregate_type_id)
     {
         $snapshot_row = $this->query()
-            ->where('aggregate_id', $aggregate_id->serialize())
-            ->where('aggregate_type_id', $aggregate_type_id->serialize())
+            ->where('aggregate_id', $aggregate_id->value())
+            ->where('aggregate_type_id', $aggregate_type_id->value())
             ->first()
         ;
 
@@ -33,7 +39,7 @@ class Repository extends AbstractQueryable implements \BoundedContext\Contracts\
         }
 
         $snapshot_array['state'] = json_decode($snapshot_array['state'], true);
-
+        
         return $this->state_snapshot_factory->tree(
             $snapshot_array
         );
@@ -41,20 +47,23 @@ class Repository extends AbstractQueryable implements \BoundedContext\Contracts\
 
     public function save(Snapshot $snapshot)
     {
+        //Broken, disable for now
+        $encoded_state = json_encode($snapshot->schema()->data_tree());
+        
         $this->query()->getConnection()->statement(
           'INSERT INTO ' . $this->table .
           ' (aggregate_id, aggregate_type_id, occurred_at, version, state) ' .
             'VALUES( '
                 . '\'' . $snapshot->aggregate_id()->value() . '\','
                 . '\'' . $snapshot->aggregate_type_id()->value() . '\','
-                . '\'' . $snapshot->occurred_at()->serialize() . '\','
-                . '\'' . $snapshot->version()->serialize() . '\','
-                . '\'' . json_encode($snapshot->schema()->serialize()) . '\'' .
+                . '\'' . $snapshot->occurred_at()->value() . '\','
+                . '\'' . $snapshot->version()->value() . '\','
+                . '\'' . $encoded_state . '\'' .
             ') ' .
           'ON DUPLICATE KEY UPDATE ' .
-            'occurred_at = \'' . $snapshot->occurred_at()->serialize() . '\', ' .
-            'version = \'' . $snapshot->version()->serialize() . '\', ' .
-            'state = \'' . json_encode($snapshot->schema()->serialize()) . '\''
+            'occurred_at = \'' . $snapshot->occurred_at()->value() . '\', ' .
+            'version = \'' . $snapshot->version()->value() . '\', ' .
+            'state = \'' . $encoded_state . '\''
         );
     }
 }

@@ -2,7 +2,7 @@
 
 use BoundedContext\Contracts\Event\Snapshot\Snapshot;
 use BoundedContext\Contracts\Event\Snapshot\Upgrader;
-use BoundedContext\Laravel\Serializer\Deserializer;
+use EventSourced\ValueObject\Deserializer\Deserializer;
 use BoundedContext\Map\Map;
 
 class Factory implements \BoundedContext\Contracts\Event\Factory
@@ -24,15 +24,15 @@ class Factory implements \BoundedContext\Contracts\Event\Factory
 
     public function snapshot(Snapshot $snapshot)
     {
-        $snapshot = $this->snapshot_upgrader->snapshot($snapshot);
+        $upgraded_snapshot = $this->snapshot_upgrader->snapshot($snapshot);
 
         $event_class = $this->event_map->get_class(
-            $snapshot->type_id()
+            $upgraded_snapshot->type_id()
         );
 
         return $this->deserializer->deserialize(
             $event_class,
-            $snapshot->schema()->serialize()
+            $upgraded_snapshot->schema()->data_tree()
         );
     }
 }

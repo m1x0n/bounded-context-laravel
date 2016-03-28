@@ -5,7 +5,7 @@ use BoundedContext\Contracts\Generator\DateTime;
 use BoundedContext\Contracts\Generator\Identifier;
 use BoundedContext\Map\Map;
 use BoundedContext\Schema\Schema;
-use BoundedContext\ValueObject\Integer as Integer_;
+use EventSourced\ValueObject\ValueObject\Integer;
 
 class Factory implements \BoundedContext\Contracts\Event\Version\Factory
 {
@@ -34,7 +34,7 @@ class Factory implements \BoundedContext\Contracts\Event\Version\Factory
             $loggable_class
         );
 
-        $upgrader = new $upgrader_class(new Schema(), new Integer_());
+        $upgrader = new $upgrader_class(new Schema(), new Integer(0));
 
         return $upgrader->latest_version();
     }

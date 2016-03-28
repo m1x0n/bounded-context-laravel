@@ -28,7 +28,7 @@ class Command implements \BoundedContext\Contracts\Sourced\Log\Command
         $snapshot = $this->snapshot_factory->loggable($command);
         $this->connection->table($this->table)->insert([
             'id' => $this->binary_string_factory->uuid($snapshot->id()),
-            'snapshot' => json_encode($snapshot->serialize())
+            'snapshot' => json_encode($snapshot->schema()->data_tree())
         ]);
     }
 

@@ -2,13 +2,9 @@
 
 namespace BoundedContext\Laravel\Providers;
 
-use BoundedContext\Laravel\Illuminate;
-use BoundedContext\Laravel\Illuminate\Log\Log;
-
 use BoundedContext\Map\Map;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
-
 
 class BoundedContextProvider extends ServiceProvider
 {
@@ -103,18 +99,24 @@ class BoundedContextProvider extends ServiceProvider
          */
 
         $this->app->bind(
-            'BoundedContext\Contracts\Sourced\Stream\Factory',
-            'BoundedContext\Laravel\Illuminate\Stream\Factory'
+            \BoundedContext\Contracts\Sourced\Stream\Factory::class,
+            \BoundedContext\Laravel\Illuminate\Stream\Factory::class
         );
 
         $this->app->bind(
-            'BoundedContext\Contracts\Sourced\Stream\Builder',
-            'BoundedContext\Sourced\Stream\Builder'
+            \BoundedContext\Contracts\Sourced\Stream\Builder::class,
+            \BoundedContext\Sourced\Stream\Builder::class
         );
 
-        $this->app->singleton(\BoundedContext\Contracts\Sourced\Log\Event::class, Illuminate\Log\Event::class);
+        $this->app->singleton(
+            \BoundedContext\Contracts\Sourced\Log\Event::class, 
+            \BoundedContext\Laravel\Illuminate\Log\Event::class
+        );
 
-        $this->app->singleton(\BoundedContext\Contracts\Sourced\Log\Command::class, Illuminate\Log\Command::class);
+        $this->app->singleton(
+            \BoundedContext\Contracts\Sourced\Log\Command::class, 
+            \BoundedContext\Laravel\Illuminate\Log\Command::class
+        );
 
         /**
          * Aggregates
@@ -249,8 +251,8 @@ class BoundedContextProvider extends ServiceProvider
         );
 
         $this->app->bind(
-            'BoundedContext\Contracts\ValueObject\Identifier',
-            'BoundedContext\Laravel\ValueObject\Uuid'
+            'EventSourced\ValueObject\Contracts\ValueObject\Identifier',
+            'EventSourced\ValueObject\ValueObject\Uuid'
         );
 
         $this->app->bind(
@@ -259,8 +261,8 @@ class BoundedContextProvider extends ServiceProvider
         );
 
         $this->app->bind(
-            'BoundedContext\Contracts\ValueObject\DateTime',
-            'BoundedContext\Laravel\ValueObject\DateTime'
+            'EventSourced\ValueObject\Contracts\ValueObject\DateTime',
+            'EventSourced\ValueObject\ValueObject\DateTime'
         );
 
         $this->app->bind(
@@ -271,6 +273,21 @@ class BoundedContextProvider extends ServiceProvider
         $this->app->bind(
             'BoundedContext\Contracts\Sourced\Aggregate\TypeId\Factory',
             'BoundedContext\Sourced\Aggregate\TypeId\Factory'
+        );
+        
+        $this->app->bind(
+            \EventSourced\ValueObject\Serializer\Reflector::class,
+            \EventSourced\ValueObject\Reflector\Reflector::class
+        );
+        
+        $this->app->bind(
+            \EventSourced\ValueObject\Deserializer\Reflector::class,
+            \EventSourced\ValueObject\Reflector\Reflector::class
+        );
+        
+        $this->app->bind(
+            \EventSourced\ValueObject\Contracts\Serializer::class,
+            \EventSourced\ValueObject\Serializer\Serializer::class
         );
     }
 }

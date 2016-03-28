@@ -1,7 +1,7 @@
 <?php namespace BoundedContext\Laravel\Player\Collection;
 
 use BoundedContext\Collection\Collection;
-use BoundedContext\Laravel\ValueObject\Uuid;
+use EventSourced\ValueObject\ValueObject\Uuid;
 use BoundedContext\Player\Collection\Player;
 use Illuminate\Support\Facades\Config;
 use BoundedContext\Player\Repository;

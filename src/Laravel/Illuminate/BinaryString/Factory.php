@@ -1,6 +1,6 @@
 <?php namespace BoundedContext\Laravel\Illuminate\BinaryString;
 
-use BoundedContext\Laravel\ValueObject\Uuid;
+use EventSourced\ValueObject\ValueObject\Uuid;
 
 class Factory
 {

@@ -39,11 +39,7 @@ class Dispatcher implements \BoundedContext\Contracts\Bus\Dispatcher
 
     public function dispatch(Command $command)
     {
-        $this->connection->beginTransaction();
-
         $this->run($command);
-
-        $this->connection->commit();
     }
 
     public function dispatch_collection(Collection $commands)

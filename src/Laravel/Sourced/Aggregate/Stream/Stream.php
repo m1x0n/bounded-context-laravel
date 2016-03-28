@@ -1,9 +1,9 @@
 <?php namespace BoundedContext\Laravel\Sourced\Aggregate\Stream;
 
-use BoundedContext\Contracts\ValueObject\Identifier;
+use EventSourced\ValueObject\Contracts\ValueObject\Identifier;
 use BoundedContext\Laravel\Event\Snapshot\Factory as EventSnapshotFactory;
 use BoundedContext\Sourced\Stream\AbstractStream;
-use BoundedContext\ValueObject\Integer as Integer_;
+use EventSourced\ValueObject\ValueObject\Integer as Integer_;
 use Illuminate\Database\ConnectionInterface;
 use BoundedContext\Laravel\Illuminate\BinaryString;
 
@@ -66,11 +66,11 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
                 $this->binary_string_factory->uuid($this->aggregate_type_id)
             )
             ->orderBy("order")
-            ->limit($this->chunk_size->serialize())
-            ->offset($this->current_offset->serialize());
+            ->limit($this->chunk_size->value())
+            ->offset($this->current_offset->value());
                 
         $rows = $query->get();
-
+ 
         return $rows;
     }
 

@@ -1,8 +1,8 @@
 <?php namespace BoundedContext\Laravel\Illuminate\Stream;
 
-use BoundedContext\Contracts\ValueObject\Identifier;
+use EventSourced\ValueObject\Contracts\ValueObject\Identifier;
 use BoundedContext\Sourced\Stream\AbstractStream;
-use BoundedContext\ValueObject\Integer as Integer_;
+use EventSourced\ValueObject\ValueObject\Integer as Integer_;
 
 use BoundedContext\Laravel\Event\Snapshot\Factory as EventSnapshotFactory;
 use Illuminate\Database\ConnectionInterface;
@@ -56,7 +56,7 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
             ->table($this->log_table)
             ->select("snapshot", "order")
             ->orderBy("order")
-            ->limit($this->chunk_size->serialize());
+            ->limit($this->chunk_size->value());
         
         if (is_null($this->order_offset)) {
             $query = $query->whereRaw("
