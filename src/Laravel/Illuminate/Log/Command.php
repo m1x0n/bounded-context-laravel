@@ -25,7 +25,7 @@ class Command implements \BoundedContext\Contracts\Sourced\Log\Command
     
     public function append(\BoundedContext\Contracts\Command\Command $command)
     {
-        $snapshot = $this->snapshot_factory->loggable($command);
+        $snapshot = $this->snapshot_factory->command($command);
         $this->connection->table($this->table)->insert([
             'id' => $this->binary_string_factory->uuid($snapshot->id()),
             'snapshot' => json_encode($snapshot->schema()->data_tree())

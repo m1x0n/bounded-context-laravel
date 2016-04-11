@@ -54,7 +54,7 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
         
         $inserts = [];
         foreach ($events as $event) {
-            $snapshot = $this->snapshot_factory->loggable($event);
+            $snapshot = $this->snapshot_factory->event($event);
             $encoded_snapshot = $this->encode_snapshot($snapshot);
             $inserts[] = [
                 'id' => $this->binary_string_factory->uuid($snapshot->id()),

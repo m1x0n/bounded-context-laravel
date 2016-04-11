@@ -90,8 +90,8 @@ class BoundedContextProvider extends ServiceProvider
             ->give('EventsMap');
 
         $this->app->bind(
-            'BoundedContext\Contracts\Event\Version\Factory',
-            'BoundedContext\Laravel\Event\Version\Factory'
+            'BoundedContext\Contracts\Version\Factory',
+            'BoundedContext\Laravel\Version\Factory'
         );
 
         /**

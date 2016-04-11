@@ -1,8 +1,9 @@
 <?php namespace BoundedContext\Laravel\Event\Snapshot;
 
-use BoundedContext\Contracts\Core\Loggable;
+use BoundedContext\Contracts\Event\Event;
 use BoundedContext\Event\Snapshot\Snapshot;
-use BoundedContext\Contracts\Event\Version\Factory as EventVersionFactory;
+use BoundedContext\Contracts\Command\Command;
+use BoundedContext\Contracts\Version\Factory as EventVersionFactory;
 use BoundedContext\Contracts\Generator\DateTime;
 use BoundedContext\Contracts\Generator\Identifier;
 use BoundedContext\Schema\Schema;
@@ -34,14 +35,26 @@ class Factory implements \BoundedContext\Contracts\Event\Snapshot\Factory
         $this->serializer = $serializer;
     }
 
-    public function loggable(Loggable $loggable)
+    public function event(Event $event)
     {
-        $serialized = $this->serializer->serialize($loggable);
+        $serialized = $this->serializer->serialize($event);
         return new Snapshot(
             $this->identifier_generator->generate(),
-            $this->event_version_factory->loggable($loggable),
+            $this->event_version_factory->event($event),
             $this->datetime_generator->now(),
-            $this->event_map->get_id($loggable),
+            $this->event_map->get_id($event),
+            new Schema($serialized)
+        );
+    }
+    
+    public function command(Command $command)
+    {
+        $serialized = $this->serializer->serialize($command);
+        return new Snapshot(
+            $this->identifier_generator->generate(),
+            $this->event_version_factory->command($command),
+            $this->datetime_generator->now(),
+            $this->event_map->get_id($command),
             new Schema($serialized)
         );
     }
