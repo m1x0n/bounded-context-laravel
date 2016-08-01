@@ -2,8 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-use BoundedContext\Laravel\Illuminate\Log\Event;
-
 class CreateEventLogTable extends Migration
 {
     /**
@@ -13,7 +11,7 @@ class CreateEventLogTable extends Migration
      */
     public function up()
     {
-        $table = config('event_logs.table_name');
+        $table = config('logs.event_log.table_name');
         DB::statement("
             CREATE TABLE `$table` (
             `id` binary(16) NOT NULL DEFAULT '0000000000000000',
@@ -35,7 +33,7 @@ class CreateEventLogTable extends Migration
      */
     public function down()
     {
-        $table = config('event_logs.table_name');
+        $table = config('logs.event_log.table_name');
         Scheme::drop($table);
     }
 }

@@ -20,7 +20,7 @@ class Command implements \BoundedContext\Contracts\Sourced\Log\Command
         $this->snapshot_factory = $snapshot_factory;
         $this->connection = $db_manager->connection();
         $this->binary_string_factory = $binary_string_factory;
-        $this->table = "modeling_command_log";
+        $this->table = config('logs.command_log.table_name');
     }
     
     public function append(\BoundedContext\Contracts\Command\Command $command)

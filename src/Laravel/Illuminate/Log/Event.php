@@ -27,7 +27,7 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
         $this->connection = $db_manager->connection();
         $this->binary_string_factory = $binary_string_factory;
         $this->stream_builder = $stream_builder;
-        $this->log_table = config('event_logs.table_name');
+        $this->log_table = config('logs.event_log.table_name');
     }
         
     public function append_aggregate_events(Aggregate $aggregate)

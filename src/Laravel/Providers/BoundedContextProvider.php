@@ -16,11 +16,15 @@ class BoundedContextProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
+            __DIR__.'/../../config/commands.php' => config_path('commands.php'),
+        ]);
+        
+        $this->publishes([
             __DIR__.'/../../config/events.php' => config_path('events.php'),
         ]);
-
+        
         $this->publishes([
-            __DIR__.'/../../config/commands.php' => config_path('commands.php'),
+            __DIR__.'/../../config/logs.php' => config_path('logs.php'),
         ]);
 
         $this->publishes([

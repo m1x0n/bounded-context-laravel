@@ -40,7 +40,7 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
         $this->starting_offset = $starting_offset;
         $this->current_offset = $starting_offset;
         
-        $this->log_table = config('event_logs.table_name');
+        $this->log_table = config('logs.event_log.table_name');
 
         parent::__construct(
             $event_snapshot_factory,

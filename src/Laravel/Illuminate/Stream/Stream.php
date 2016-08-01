@@ -7,7 +7,6 @@ use EventSourced\ValueObject\ValueObject\Integer as Integer_;
 use BoundedContext\Laravel\Event\Snapshot\Factory as EventSnapshotFactory;
 use Illuminate\Database\ConnectionInterface;
 use BoundedContext\Laravel\Illuminate\BinaryString;
-use BoundedContext\Laravel\Illuminate\Log\Event;
 
 class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced\Stream\Stream
 {
@@ -32,7 +31,7 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
 
         $this->starting_id = $starting_id;  
         
-        $this->log_table = config('event_logs.table_name');
+        $this->log_table = config('logs.event_log.table_name');
         
         $this->reset();
         
