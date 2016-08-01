@@ -7,6 +7,7 @@ use EventSourced\ValueObject\ValueObject\Integer as Integer_;
 use BoundedContext\Laravel\Event\Snapshot\Factory as EventSnapshotFactory;
 use Illuminate\Database\ConnectionInterface;
 use BoundedContext\Laravel\Illuminate\BinaryString;
+use BoundedContext\Laravel\Illuminate\Log\Event;
 
 class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced\Stream\Stream
 {
@@ -15,6 +16,7 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
 
     private $starting_id;
     private $order_offset;
+    private $log_table;
 
     public function __construct(
         ConnectionInterface $connection,
@@ -29,6 +31,8 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
         $this->binary_string_factory = $binary_string_factory;
 
         $this->starting_id = $starting_id;  
+        
+        $this->log_table = config('event_logs.table_name');
         
         $this->reset();
         
@@ -63,16 +67,16 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
                 `order` >
                     (
                         SELECT `order` FROM `$this->log_table`
-                        WHERE id = '".$this->binary_string_factory->uuid($this->starting_id)."'
+                        WHERE id = ?
                     )
-                "
+                ", [$this->binary_string_factory->uuid($this->starting_id)]
             );
         } else {
             $query = $query->where("order", ">", $this->order_offset);
         }
 
         $rows = $query->get();
-        
+ 
         return $rows;
     }
     

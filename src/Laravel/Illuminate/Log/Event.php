@@ -13,9 +13,9 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
     private $connection;
     private $snapshot_factory;
     private $binary_string_factory;
-    private $table = "event_log";
     private $stream_builder;
-    
+    private $log_table;
+        
     public function __construct(
         Factory $snapshot_factory, 
         DatabaseManager $db_manager, 
@@ -27,6 +27,7 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
         $this->connection = $db_manager->connection();
         $this->binary_string_factory = $binary_string_factory;
         $this->stream_builder = $stream_builder;
+        $this->log_table = config('event_logs.table_name');
     }
         
     public function append_aggregate_events(Aggregate $aggregate)
@@ -63,7 +64,7 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
                 'snapshot' => $encoded_snapshot
             ];
         }
-        $this->connection->table($this->table)->insert($inserts);
+        $this->connection->table($this->log_table)->insert($inserts);
         
         $this->unlock_rows($state->aggregate_id(), $state->aggregate_type_id());
     }
@@ -82,7 +83,7 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
     private function log_version($binary_aggregate_id, $binary_aggregate_type_id)
     {
         $query = $this->connection
-            ->table($this->table)
+            ->table($this->log_table)
             ->selectRaw("COUNT(*) as version")
             ->where("aggregate_id", $binary_aggregate_id)
             ->where("aggregate_type_id", $binary_aggregate_type_id);
@@ -121,7 +122,7 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
     public function reset()
     {
         $this->connection
-            ->table($this->table)
+            ->table($this->log_table)
             ->delete();
     }
 }

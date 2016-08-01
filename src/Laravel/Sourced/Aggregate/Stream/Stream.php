@@ -17,6 +17,8 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
 
     private $starting_offset;
     private $current_offset;
+    
+    protected $log_table;
 
     public function __construct(
         ConnectionInterface $connection,
@@ -37,6 +39,8 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
         
         $this->starting_offset = $starting_offset;
         $this->current_offset = $starting_offset;
+        
+        $this->log_table = config('event_logs.table_name');
 
         parent::__construct(
             $event_snapshot_factory,

@@ -31,10 +31,13 @@ class Factory implements \BoundedContext\Contracts\Sourced\Aggregate\State\Facto
     private function parse_doc_comment($doc_comment)
     {
         $clean_doc_comment = trim(preg_replace('/\r?\n *\* *\//', '', $doc_comment));
-
         $comments = [];
         preg_match_all('/@([a-z]+)\s+(.*?)\s*(?=$|@[a-z]+\s)/s', $clean_doc_comment, $comments);
-
+                
+        $comments[2] = array_map(function($comment) {
+            return trim(str_replace("*/", "", $comment));
+        }, $comments[2]);
+        
         return array_combine($comments[1], $comments[2]);
     }
 
@@ -53,8 +56,8 @@ class Factory implements \BoundedContext\Contracts\Sourced\Aggregate\State\Facto
 
         $properties = $projection_object->getProperties();
         foreach ($properties as $property) {
+            
             $comment = $this->parse_doc_comment($property->getDocComment());
-
             $property_class_name = $comment['var'];
             $property_name = $property->name;
 

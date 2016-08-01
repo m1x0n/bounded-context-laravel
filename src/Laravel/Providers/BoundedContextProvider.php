@@ -41,17 +41,25 @@ class BoundedContextProvider extends ServiceProvider
      *
      * @return void
      */
-
     public function register()
     {
-        /**
-         * Events
-         */
-        $this->app->singleton('EventsMap', function($app) {
+        // Loggable Class IDs to Class
+        $this->app->singleton(\BoundedContext\Map\Map::class, function($app) {
             $commands = (!Config::get('commands')) ? [] : Config::get('commands');
             $events = (!Config::get('events')) ? [] : Config::get('events');
+            
+            $player_environments = Config::get('players');
+            
+            $players_array = [];
+            foreach($player_environments as $player_environment) {
+                foreach($player_environment as $player_types) {
+                    foreach($player_types as $id => $player) {
+                        $players_array[$id] = $player;
+                    }
+                }
+            }
 
-            $map = array_merge($commands, $events);
+            $map = array_merge($commands, $events, $players_array);
 
             return new Map(
                 $map,
@@ -60,115 +68,97 @@ class BoundedContextProvider extends ServiceProvider
         });
 
         $this->app->bind(
-            'BoundedContext\Contracts\Event\Snapshot\Factory',
-            'BoundedContext\Laravel\Event\Snapshot\Factory'
+            \BoundedContext\Contracts\Event\Snapshot\Factory::class,
+                \BoundedContext\Laravel\Event\Snapshot\Factory::class
         );
 
-        $this->app
-            ->when('BoundedContext\Laravel\Event\Snapshot\Factory')
-            ->needs('BoundedContext\Map\Map')
-            ->give('EventsMap');
-
         $this->app->bind(
-            'BoundedContext\Contracts\Event\Snapshot\Upgrader',
-            'BoundedContext\Laravel\Event\Snapshot\Upgrader'
+            \BoundedContext\Contracts\Event\Snapshot\Upgrader::class,
+                \BoundedContext\Laravel\Event\Snapshot\Upgrader::class
         );
 
-        $this->app
-            ->when('BoundedContext\Laravel\Event\Snapshot\Upgrader')
-            ->needs('BoundedContext\Map\Map')
-            ->give('EventsMap');
-
         $this->app->bind(
-            'BoundedContext\Contracts\Event\Factory',
-            'BoundedContext\Laravel\Event\Factory'
+            \BoundedContext\Contracts\Event\Factory::class,
+                \BoundedContext\Laravel\Event\Factory::class
         );
 
-        $this->app
-            ->when('BoundedContext\Laravel\Event\Factory')
-            ->needs('BoundedContext\Map\Map')
-            ->give('EventsMap');
-
         $this->app->bind(
-            'BoundedContext\Contracts\Version\Factory',
-            'BoundedContext\Laravel\Version\Factory'
+            \BoundedContext\Contracts\Version\Factory::class,
+                \BoundedContext\Laravel\Version\Factory::class
         );
 
         /**
          * Logs
          */
-
         $this->app->bind(
             \BoundedContext\Contracts\Sourced\Stream\Factory::class,
-            \BoundedContext\Laravel\Illuminate\Stream\Factory::class
+                \BoundedContext\Laravel\Illuminate\Stream\Factory::class
         );
 
         $this->app->bind(
             \BoundedContext\Contracts\Sourced\Stream\Builder::class,
-            \BoundedContext\Sourced\Stream\Builder::class
+                \BoundedContext\Sourced\Stream\Builder::class
         );
 
         $this->app->singleton(
             \BoundedContext\Contracts\Sourced\Log\Event::class, 
-            \BoundedContext\Laravel\Illuminate\Log\Event::class
+                \BoundedContext\Laravel\Illuminate\Log\Event::class
         );
 
         $this->app->singleton(
             \BoundedContext\Contracts\Sourced\Log\Command::class, 
-            \BoundedContext\Laravel\Illuminate\Log\Command::class
+                \BoundedContext\Laravel\Illuminate\Log\Command::class
         );
 
         /**
          * Aggregates
          */
-
         $this->app->bind(
-            'BoundedContext\Contracts\Sourced\Aggregate\State\Snapshot\Factory',
-            'BoundedContext\Sourced\Aggregate\State\Snapshot\Factory'
+            \BoundedContext\Contracts\Sourced\Aggregate\State\Snapshot\Factory::class,
+                \BoundedContext\Sourced\Aggregate\State\Snapshot\Factory::class
         );
 
         $this->app->bind(
-            'BoundedContext\Contracts\Sourced\Aggregate\State\Snapshot\Repository',
-            'BoundedContext\Laravel\Sourced\Aggregate\State\Snapshot\Repository'
+            \BoundedContext\Contracts\Sourced\Aggregate\State\Snapshot\Repository::class,
+                \BoundedContext\Laravel\Sourced\Aggregate\State\Snapshot\Repository::class
         );
 
         $this->app->bind(
-            'BoundedContext\Contracts\Sourced\Aggregate\State\Factory',
-            'BoundedContext\Laravel\Sourced\Aggregate\State\Factory'
+            \BoundedContext\Contracts\Sourced\Aggregate\State\Factory::class,
+                \BoundedContext\Laravel\Sourced\Aggregate\State\Factory::class
         );
 
         $this->app->bind(
-            'BoundedContext\Contracts\Sourced\Aggregate\Factory',
-            'BoundedContext\Laravel\Sourced\Aggregate\Factory'
+            \BoundedContext\Contracts\Sourced\Aggregate\Factory::class,
+                \BoundedContext\Laravel\Sourced\Aggregate\Factory::class
         );
 
         $this->app->bind(
-            'BoundedContext\Contracts\Sourced\Aggregate\Repository',
-            'BoundedContext\Sourced\Aggregate\Repository'
+            \BoundedContext\Contracts\Sourced\Aggregate\Repository::class,
+                \BoundedContext\Sourced\Aggregate\Repository::class
         );
 
         $this->app->bind(
-            'BoundedContext\Contracts\Sourced\Aggregate\Stream\Builder',
-            'BoundedContext\Sourced\Aggregate\Stream\Builder'
+            \BoundedContext\Contracts\Sourced\Aggregate\Stream\Builder::class,
+                \BoundedContext\Sourced\Aggregate\Stream\Builder::class
         );
 
         $this->app->bind(
-            'BoundedContext\Contracts\Sourced\Aggregate\Stream\Factory',
-            'BoundedContext\Laravel\Sourced\Aggregate\Stream\Factory'
+            \BoundedContext\Contracts\Sourced\Aggregate\Stream\Factory::class,
+                \BoundedContext\Laravel\Sourced\Aggregate\Stream\Factory::class
         );
 
         $this->app->bind(
-            'BoundedContext\Contracts\Business\Invariant\Factory',
-            'BoundedContext\Laravel\Business\Invariant\Factory'
+            \BoundedContext\Contracts\Business\Invariant\Factory::class,
+                \BoundedContext\Laravel\Business\Invariant\Factory::class
         );
 
         /**
          * Players
          */
-
         $this->app->bind(
-            'BoundedContext\Contracts\Player\Snapshot\Repository',
-            'BoundedContext\Laravel\Player\Snapshot\Repository'
+            \BoundedContext\Contracts\Player\Snapshot\Repository::class,
+            \BoundedContext\Laravel\Player\Snapshot\Repository::class
         );
 
         $projection_types = Config::get('projections');
@@ -187,10 +177,10 @@ class BoundedContextProvider extends ServiceProvider
                 $implemented_queryable =
                     chop($implemented_projection, 'Projection') .
                     "Queryable";
-
+                
                 $this->app
                     ->when($implemented_projection)
-                    ->needs('BoundedContext\Contracts\Projection\Queryable')
+                    ->needs(\BoundedContext\Contracts\Projection\Queryable::class)
                     ->give($implemented_queryable);
 
                 $this->app->singleton($projection, $implemented_projection);
@@ -198,42 +188,14 @@ class BoundedContextProvider extends ServiceProvider
             }
         }
 
-        /* Players */
-        $this->app->singleton('PlayersMap', function($app) {
-            $player_environments = Config::get('players');
-
-            if(is_null($player_environments)) {
-                return;
-            }
-
-            $players_array = [];
-            foreach($player_environments as $player_environment) {
-                foreach($player_environment as $player_types) {
-                    foreach($player_types as $id => $player) {
-                        $players_array[$id] = $player;
-                    }
-                }
-            }
-
-            return new Map(
-                $players_array,
-                $this->app->make('BoundedContext\Contracts\Generator\Identifier')
-            );
-        });
-
-        $this->app
-            ->when('BoundedContext\Laravel\Player\Factory')
-            ->needs('BoundedContext\Map\Map')
-            ->give('PlayersMap');
-
         $this->app->bind(
-            'BoundedContext\Contracts\Player\Factory',
-            'BoundedContext\Laravel\Player\Factory'
+            \BoundedContext\Contracts\Player\Factory::class,
+                \BoundedContext\Laravel\Player\Factory::class
         );
 
         $this->app->bind(
-            'BoundedContext\Contracts\Player\Repository',
-            'BoundedContext\Player\Repository'
+            \BoundedContext\Contracts\Player\Repository::class,
+                \BoundedContext\Player\Repository::class
         );
 
         /**
@@ -241,53 +203,53 @@ class BoundedContextProvider extends ServiceProvider
          */
 
         $this->app->bind(
-            'BoundedContext\Contracts\Bus\Dispatcher',
-            'BoundedContext\Laravel\Bus\Dispatcher'
+            \BoundedContext\Contracts\Bus\Dispatcher::class,
+                \BoundedContext\Laravel\Bus\Dispatcher::class
         );
 
         $this->app->bind(
-            'BoundedContext\Contracts\Generator\Identifier',
-            'BoundedContext\Laravel\Generator\Uuid'
+            \BoundedContext\Contracts\Generator\Identifier::class,
+                \BoundedContext\Laravel\Generator\Uuid::class
         );
 
         $this->app->bind(
-            'EventSourced\ValueObject\Contracts\ValueObject\Identifier',
-            'EventSourced\ValueObject\ValueObject\Uuid'
+            \EventSourced\ValueObject\Contracts\ValueObject\Identifier::class,
+                \EventSourced\ValueObject\ValueObject\Uuid::class
         );
 
         $this->app->bind(
-            'BoundedContext\Contracts\Generator\DateTime',
-            'BoundedContext\Laravel\Generator\DateTime'
+            \BoundedContext\Contracts\Generator\DateTime::class,
+                \BoundedContext\Laravel\Generator\DateTime::class
         );
 
         $this->app->bind(
-            'EventSourced\ValueObject\Contracts\ValueObject\DateTime',
-            'EventSourced\ValueObject\ValueObject\DateTime'
+            \EventSourced\ValueObject\Contracts\ValueObject\DateTime::class,
+                \EventSourced\ValueObject\ValueObject\DateTime::class
         );
 
         $this->app->bind(
-            'BoundedContext\Contracts\Projection\Factory',
-            'BoundedContext\Laravel\Illuminate\Projection\Factory'
+            \BoundedContext\Contracts\Projection\Factory::class,
+                \BoundedContext\Laravel\Illuminate\Projection\Factory::class
         );
         
         $this->app->bind(
-            'BoundedContext\Contracts\Sourced\Aggregate\TypeId\Factory',
-            'BoundedContext\Sourced\Aggregate\TypeId\Factory'
+            \BoundedContext\Contracts\Sourced\Aggregate\TypeId\Factory::class,
+                \BoundedContext\Sourced\Aggregate\TypeId\Factory::class
         );
         
         $this->app->bind(
             \EventSourced\ValueObject\Serializer\Reflector::class,
-            \EventSourced\ValueObject\Reflector\Reflector::class
+                \EventSourced\ValueObject\Reflector\Reflector::class
         );
         
         $this->app->bind(
             \EventSourced\ValueObject\Deserializer\Reflector::class,
-            \EventSourced\ValueObject\Reflector\Reflector::class
+                \EventSourced\ValueObject\Reflector\Reflector::class
         );
         
         $this->app->bind(
             \EventSourced\ValueObject\Contracts\Serializer::class,
-            \EventSourced\ValueObject\Serializer\Serializer::class
+                \EventSourced\ValueObject\Serializer\Serializer::class
         );
     }
 }
