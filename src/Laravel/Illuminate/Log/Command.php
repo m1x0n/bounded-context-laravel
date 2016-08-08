@@ -30,12 +30,20 @@ class Command implements \BoundedContext\Contracts\Sourced\Log\Command
             'id' => $this->binary_string_factory->uuid($snapshot->id()),
             'snapshot' => json_encode($snapshot->schema()->data_tree())
         ]);
+        self::$last_id = $snapshot->id();
     }
+    
+    private static $last_id;
 
     public function reset()
     {
         $this->connection
             ->table($this->table)
             ->delete();
+    }
+
+    public function last_id()
+    {
+        return self::$last_id;
     }
 }
