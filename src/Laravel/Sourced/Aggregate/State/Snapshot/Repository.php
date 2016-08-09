@@ -12,6 +12,8 @@ class Repository extends AbstractQueryable implements \BoundedContext\Contracts\
     protected $state_snapshot_factory;
     protected $table = 'snapshots_aggregate_state';
     protected $serializer;
+    
+    const SNAPSHOT_AT = 1000;
 
     public function __construct(
         Application $app, 
@@ -47,6 +49,11 @@ class Repository extends AbstractQueryable implements \BoundedContext\Contracts\
 
     public function save(Snapshot $snapshot)
     {
+        $should_snapshot = ($snapshot->version()->value() % self::SNAPSHOT_AT) == 0;
+        if (!$should_snapshot) {
+            return;
+        }
+        
         //Broken, disable for now
         $encoded_state = json_encode($snapshot->schema()->data_tree());
         

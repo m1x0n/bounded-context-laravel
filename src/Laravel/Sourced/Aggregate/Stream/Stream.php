@@ -74,7 +74,6 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
             ->offset($this->current_offset->value());
                 
         $rows = $query->get();
- 
         return $rows;
     }
 

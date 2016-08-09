@@ -37,6 +37,10 @@ class Upgrader implements \BoundedContext\Contracts\Event\Snapshot\Upgrader
             $upgrader->version(),
             $snapshot->occurred_at(),
             $snapshot->type_id(),
+            $snapshot->type(),
+            $snapshot->command_id(),
+            $snapshot->root_entity_id(),
+            $snapshot->aggregate_type_id(),
             $upgrader->schema()
         );
     }

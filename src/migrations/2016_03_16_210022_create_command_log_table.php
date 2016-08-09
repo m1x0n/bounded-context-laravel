@@ -13,7 +13,6 @@ class CreateCommandLogTable extends Migration
     {
         DB::statement("
             CREATE TABLE `command_log` (
-            `id` binary(16) NOT NULL DEFAULT '0000000000000000',
             `order` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
             `snapshot` mediumtext COLLATE utf8_unicode_ci NOT NULL,
             PRIMARY KEY (`order`)

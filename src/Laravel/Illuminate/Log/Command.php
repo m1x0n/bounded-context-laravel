@@ -27,23 +27,24 @@ class Command implements \BoundedContext\Contracts\Sourced\Log\Command
     {
         $snapshot = $this->snapshot_factory->command($command);
         $this->connection->table($this->table)->insert([
-            'id' => $this->binary_string_factory->uuid($snapshot->id()),
-            'snapshot' => json_encode($snapshot->schema()->data_tree())
+            'snapshot' => $this->encode_snapshot($snapshot)
         ]);
-        self::$last_id = $snapshot->id();
     }
     
-    private static $last_id;
-
+    private function encode_snapshot(\BoundedContext\Contracts\Command\Snapshot\Snapshot $snapshot)
+    {
+        return json_encode([
+            'type_id' => $snapshot->type_id()->value(),
+            'version' => $snapshot->version()->value(),
+            'occurred_at' => $snapshot->occurred_at()->value(),
+            'command' => $snapshot->schema()->data_tree()
+        ]);
+    }
+   
     public function reset()
     {
         $this->connection
             ->table($this->table)
             ->delete();
-    }
-
-    public function last_id()
-    {
-        return self::$last_id;
     }
 }

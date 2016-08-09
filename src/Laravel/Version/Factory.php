@@ -1,13 +1,13 @@
 <?php namespace BoundedContext\Laravel\Version;
 
-use BoundedContext\Contracts\Event\Event;
+use BoundedContext\Contracts\Event\DomainEvent;
 use BoundedContext\Contracts\Command\Command;
 use BoundedContext\Schema\Schema;
 use EventSourced\ValueObject\ValueObject\Integer;
 
 class Factory implements \BoundedContext\Contracts\Version\Factory
 {
-    public function event(Event $event)
+    public function event(DomainEvent $event)
     {
         $event_class = get_class($event);
         $upgrader_class = preg_replace('/Event/', 'Upgrader\\Event', $event_class);

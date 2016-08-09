@@ -32,16 +32,14 @@ class Dispatcher implements \BoundedContext\Contracts\Bus\Dispatcher
         $aggregate = $this->aggregate_repository->by($command);
 
         $aggregate->handle($command);
-
-        $this->aggregate_repository->save(
-            $aggregate
-        );
+        
+        $this->aggregate_repository->save($aggregate);
 
         $this->command_log->append($command);
         
         $this->player_builder->all()->get()->play();
     }
-
+    
     public function dispatch(Command $command)
     {
         $this->connection->beginTransaction();

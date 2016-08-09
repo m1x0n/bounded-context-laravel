@@ -14,7 +14,7 @@ class CreateEventLogTable extends Migration
         $table = config('logs.event_log.table_name');
         DB::statement("
             CREATE TABLE `$table` (
-            `id` binary(16) NOT NULL DEFAULT '0000000000000000',
+            `id` binary(16) NOT NULL DEFAULT '0000000000000000',   
             `order` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
             `aggregate_id` binary(16) NOT NULL DEFAULT '0000000000000000',
             `aggregate_type_id` binary(16) NOT NULL DEFAULT '0000000000000000',
