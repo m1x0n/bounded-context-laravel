@@ -82,7 +82,7 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
             'id' => $snapshot->id()->value(),
             'type' => $snapshot->type()->value(),
             'type_id' => $snapshot->type_id()->value(),
-            'root_entity_id' => $snapshot->root_entity_id()->value(),
+            'aggregate_id' => $snapshot->aggregate_id()->value(),
             'aggregate_type_id' => $snapshot->aggregate_type_id()->value(),
             'command_id' => $snapshot->command_id()->value(),
             'version' => $snapshot->version()->value(),

@@ -22,7 +22,7 @@ class Factory implements \BoundedContext\Contracts\Sourced\Aggregate\State\Facto
 
         $aggregate_prefix = substr($command_class, 0, strpos($command_class, "Command"));
 
-        $this->state_class = $aggregate_prefix . 'State';
+        $this->state_class = $aggregate_prefix . 'Projector';
         $this->state_projection_class = $aggregate_prefix . 'Projection';
 
         return $this;

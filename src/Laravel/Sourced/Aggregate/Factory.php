@@ -28,7 +28,7 @@ class Factory implements \BoundedContext\Contracts\Sourced\Aggregate\Factory
         $state_prefix = substr(
             $state_class,
             0,
-            strpos($state_class, "State")
+            strpos($state_class, "Projector")
         );
 
         $aggregate_class = $state_prefix . "Aggregate";

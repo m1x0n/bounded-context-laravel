@@ -48,7 +48,7 @@ class Factory implements \BoundedContext\Contracts\Event\Snapshot\Factory, \Boun
             $this->map->get_id($domain_event),
             $this->event_to_type($domain_event),
             $event->command_id(),
-            $event->root_entity_id(),
+            $event->aggregate_id(),
             $event->aggregate_type_id(),         
             new Schema($serialized)
         );
@@ -85,7 +85,7 @@ class Factory implements \BoundedContext\Contracts\Event\Snapshot\Factory, \Boun
             $this->identifier_generator->string($schema->type_id),
             new EventType($schema->type),
             $this->identifier_generator->string($schema->command_id),
-            $this->identifier_generator->string($schema->root_entity_id),
+            $this->identifier_generator->string($schema->aggregate_id),
             $this->identifier_generator->string($schema->aggregate_type_id),
             new Schema($schema->event)
         );
