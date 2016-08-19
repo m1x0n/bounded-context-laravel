@@ -52,8 +52,7 @@ class Dispatcher implements \BoundedContext\Contracts\Bus\Dispatcher
     {
         $this->connection->beginTransaction();
 
-        foreach($commands as $command)
-        {
+        foreach ($commands as $command) {
             $this->run($command);
         }
 

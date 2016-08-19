@@ -54,6 +54,8 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
         $this->unlock_rows($state->aggregate_id(), $state->aggregate_type_id());
     }
         
+    private static $appended_events = [];
+    
     private function store_events(Aggregate $aggregate)
     {
         $events = $aggregate->changes();
@@ -72,6 +74,7 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
                 'aggregate_type_id' => $binary_aggregate_type_id,
                 'snapshot' => $encoded_snapshot
             ];
+            static::$appended_events[] = $encoded_snapshot;
         }
         $this->connection->table($this->log_table)->insert($inserts);
     }
@@ -138,5 +141,12 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
         $this->connection
             ->table($this->log_table)
             ->delete();
+    }
+
+    public function get_appended_events()
+    {
+        $events = static::$appended_events;
+        static::$appended_events = [];
+        return $events;
     }
 }
