@@ -4,7 +4,6 @@ use EventSourced\ValueObject\Contracts\ValueObject\Identifier;
 use BoundedContext\Contracts\Sourced\Aggregate\State\Snapshot\Factory as StateSnapshotFactory;
 use BoundedContext\Contracts\Sourced\Aggregate\State\Snapshot\Snapshot;
 use BoundedContext\Laravel\Illuminate\Projection\AbstractQueryable;
-use Illuminate\Contracts\Foundation\Application;
 use EventSourced\ValueObject\Serializer\Serializer;
 
 class Repository extends AbstractQueryable implements \BoundedContext\Contracts\Sourced\Aggregate\State\Snapshot\Repository
@@ -14,11 +13,10 @@ class Repository extends AbstractQueryable implements \BoundedContext\Contracts\
     protected $serializer;
     
     public function __construct(
-        Application $app, 
         StateSnapshotFactory $state_snapshot_factory,
         Serializer $serializer)
     {
-        parent::__construct($app);
+        parent::__construct();
 
         $this->state_snapshot_factory = $state_snapshot_factory;
         $this->serializer = $serializer;

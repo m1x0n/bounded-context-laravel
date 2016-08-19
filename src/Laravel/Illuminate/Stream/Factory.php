@@ -2,29 +2,23 @@
 
 use EventSourced\ValueObject\Contracts\ValueObject\Identifier;
 use EventSourced\ValueObject\ValueObject\Integer as Integer_;
-use Illuminate\Contracts\Foundation\Application;
+use DB;
+use App;
 
 class Factory implements \BoundedContext\Contracts\Sourced\Stream\Factory
 {
-    private $application;
-
-    public function __construct(Application $application)
-    {
-        $this->application = $application;
-    }
-
     public function create(
         Identifier $starting_id,
         Integer_ $limit,
         Integer_ $chunk_size
     )
     {
-        return $this->application->make(
-            'BoundedContext\Laravel\Illuminate\Stream\Stream',
+        return App::make(
+            \BoundedContext\Laravel\Illuminate\Stream\Stream::class,
             [
-                $this->application->make('db')->connection(),
-                $this->application->make('BoundedContext\Laravel\Event\Snapshot\Factory'),
-                $this->application->make(\BoundedContext\Laravel\Illuminate\BinaryString\Factory::class),
+                DB::connection(),
+                App::make(\BoundedContext\Laravel\Event\Snapshot\Factory::class),
+                App::make(\BoundedContext\Laravel\Illuminate\BinaryString\Factory::class),
                 $starting_id,
                 $limit,
                 $chunk_size

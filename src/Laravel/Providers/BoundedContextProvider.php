@@ -255,5 +255,10 @@ class BoundedContextProvider extends ServiceProvider
             \EventSourced\ValueObject\Contracts\Serializer::class,
                 \EventSourced\ValueObject\Serializer\Serializer::class
         );
+        
+        $this->app->bind(
+            \EventSourced\ValueObject\Contracts\Deserializer::class,
+                \EventSourced\ValueObject\Deserializer\Deserializer::class
+        );
     }
 }
