@@ -54,9 +54,9 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
 
         $this->unlock_rows($state->aggregate_id(), $state->aggregate_type());
     }
-
+        
     private static $appended_events = [];
-
+   
     private function store_events(Aggregate $aggregate)
     {
         $events = $aggregate->changes();
