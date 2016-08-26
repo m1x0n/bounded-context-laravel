@@ -3,18 +3,16 @@
 use BoundedContext\Map\Map;
 use BoundedContext\Contracts\Player\Snapshot\Snapshot;
 use BoundedContext\Contracts\Projection\Projection;
-use Illuminate\Contracts\Foundation\Application;
 use BoundedContext\Contracts\Sourced\Log\Event as EventLog;
+use App;
 
 class Factory implements \BoundedContext\Contracts\Player\Factory
 {
-    private $app;
     private $players_map;
     private $event_log;
 
-    public function __construct(Application $app, Map $players_map, EventLog $event_log)
+    public function __construct(Map $players_map, EventLog $event_log)
     {
-        $this->app = $app;
         $this->players_map = $players_map;
         $this->event_log = $event_log;
     }
@@ -38,7 +36,7 @@ class Factory implements \BoundedContext\Contracts\Player\Factory
             $parameter_contract = $parameter->getClass()->name;
 
             if ($parameter_contract === Projection::class) {
-                $args[$parameter_name] = $this->app->make(
+                $args[$parameter_name] = App::make(
                     $this->get_implementation_by_interface($player_class)
                 );
             } elseif ($parameter_contract === Snapshot::class) {
@@ -46,7 +44,7 @@ class Factory implements \BoundedContext\Contracts\Player\Factory
             } elseif ($parameter_contract === EventLog::class) {
                 $args[$parameter_name] = $this->event_log;
             } else {
-                $args[$parameter_name] = $this->app->make($parameter_contract);
+                $args[$parameter_name] = App::make($parameter_contract);
             }
         }
 

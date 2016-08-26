@@ -26,9 +26,7 @@ class Factory implements \BoundedContext\Contracts\Event\Factory
     {
         $upgraded_snapshot = $this->snapshot_upgrader->snapshot($snapshot);
 
-        $event_class = $this->event_map->get_class(
-            $upgraded_snapshot->type_id()
-        );
+        $event_class = $snapshot->type()->to_event_class();
 
         return $this->deserializer->deserialize(
             $event_class,

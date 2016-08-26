@@ -64,7 +64,7 @@ class BoundedContextProvider extends ServiceProvider
             }
 
             $map = array_merge($commands, $events, $players_array);
-
+            
             return new Map(
                 $map,
                 $this->app->make('BoundedContext\Contracts\Generator\Identifier')
@@ -237,8 +237,8 @@ class BoundedContextProvider extends ServiceProvider
         );
         
         $this->app->bind(
-            \BoundedContext\Contracts\Sourced\Aggregate\TypeId\Factory::class,
-                \BoundedContext\Sourced\Aggregate\TypeId\Factory::class
+            \BoundedContext\Contracts\Sourced\Aggregate\Type\Factory::class,
+                \BoundedContext\Sourced\Aggregate\Type\Factory::class
         );
         
         $this->app->bind(
@@ -254,6 +254,11 @@ class BoundedContextProvider extends ServiceProvider
         $this->app->bind(
             \EventSourced\ValueObject\Contracts\Serializer::class,
                 \EventSourced\ValueObject\Serializer\Serializer::class
+        );
+        
+        $this->app->bind(
+            \EventSourced\ValueObject\Contracts\Deserializer::class,
+                \EventSourced\ValueObject\Deserializer\Deserializer::class
         );
     }
 }

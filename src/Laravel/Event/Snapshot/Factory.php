@@ -9,10 +9,10 @@ use BoundedContext\Contracts\Generator\DateTime;
 use BoundedContext\Contracts\Generator\Identifier;
 use BoundedContext\Schema\Schema;
 use BoundedContext\Contracts\Schema\Schema as SchemaContract;
-use BoundedContext\Map\Map;
-use EventSourced\ValueObject\ValueObject\Integer;
+use EventSourced\ValueObject\ValueObject\Integer as Integer_;
 use EventSourced\ValueObject\Serializer\Serializer;
 use BoundedContext\Event\Type as EventType;
+use BoundedContext\Event\AggregateType;
 
 class Factory implements \BoundedContext\Contracts\Event\Snapshot\Factory, \BoundedContext\Contracts\Command\Snapshot\Factory
 {
@@ -26,14 +26,12 @@ class Factory implements \BoundedContext\Contracts\Event\Snapshot\Factory, \Boun
         Identifier $identifier_generator,
         DateTime $datetime_generator,
         EventVersionFactory $event_version_factory,
-        Map $map,
         Serializer $serializer
     )
     {
         $this->identifier_generator = $identifier_generator;
         $this->datetime_generator = $datetime_generator;
         $this->event_version_factory = $event_version_factory;
-        $this->map = $map;
         $this->serializer = $serializer;
     }
 
@@ -41,15 +39,16 @@ class Factory implements \BoundedContext\Contracts\Event\Snapshot\Factory, \Boun
     {
         $serialized = $this->serializer->serialize($event->values());
         $domain_event = $event->values();
+        $event_type = $this->event_type($domain_event);
+        $aggregate_type = $event->aggregate_type();
         return new Snapshot(
             $event->id(),
             $this->event_version_factory->event($domain_event),
             $this->datetime_generator->now(),
-            $this->map->get_id($domain_event),
-            $this->event_to_type($domain_event),
+            $event_type,
             $event->command_id(),
             $event->aggregate_id(),
-            $event->aggregate_type_id(),         
+            $aggregate_type,
             new Schema($serialized)
         );
     }
@@ -57,15 +56,16 @@ class Factory implements \BoundedContext\Contracts\Event\Snapshot\Factory, \Boun
     public function command(Command $command)
     {
         $serialized = $this->serializer->serialize($command);
+        $command_type = $this->event_type($command);
         return new CommandSnapshot(
             $this->event_version_factory->command($command),
             $this->datetime_generator->now(),
-            $this->map->get_id($command),
+            $command_type,
             new Schema($serialized)
         );
     }
     
-    private function event_to_type($event)
+    private function event_type($event)
     {
         $class = strtolower(get_class($event));
         $parts = explode("\\", $class);
@@ -80,13 +80,12 @@ class Factory implements \BoundedContext\Contracts\Event\Snapshot\Factory, \Boun
     {
         return new Snapshot(
             $this->identifier_generator->string($schema->id),
-            new Integer($schema->version),
+            new Integer_($schema->version),
             $this->datetime_generator->string($schema->occurred_at),
-            $this->identifier_generator->string($schema->type_id),
             new EventType($schema->type),
             $this->identifier_generator->string($schema->command_id),
             $this->identifier_generator->string($schema->aggregate_id),
-            $this->identifier_generator->string($schema->aggregate_type_id),
+            new AggregateType($schema->aggregate_type),
             new Schema($schema->event)
         );
     }

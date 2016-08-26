@@ -1,16 +1,13 @@
 <?php namespace BoundedContext\Laravel\Business\Invariant;
 
 use BoundedContext\Contracts\Projection\Queryable;
-use Illuminate\Contracts\Foundation\Application;
 
 class Factory implements \BoundedContext\Contracts\Business\Invariant\Factory
 {
-    protected $app;
     protected $queryable;
 
-    public function __construct(Application $app)
+    public function __construct()
     {
-        $this->app = $app;
         $this->queryable = null;
     }
 
@@ -33,11 +30,11 @@ class Factory implements \BoundedContext\Contracts\Business\Invariant\Factory
             ->name
         ;
 
-        if($queryable_name == $state_queryable_class)
-        {
+        if ($queryable_name == $state_queryable_class) {
             return new $class($this->queryable);
         }
 
+        throw \Exception("Lumen error, need to change line below this to work");
         return new $class(
             $this->app->make($queryable_name)
         );

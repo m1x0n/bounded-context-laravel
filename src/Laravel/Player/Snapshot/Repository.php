@@ -3,25 +3,22 @@
 use BoundedContext\Contracts\Player\Snapshot\Snapshot;
 use EventSourced\ValueObject\Contracts\ValueObject\Identifier;
 use BoundedContext\Player\Snapshot\Factory;
-use Illuminate\Contracts\Foundation\Application;
 use EventSourced\ValueObject\Serializer\Serializer;
+use DB;
 
 class Repository implements \BoundedContext\Contracts\Player\Snapshot\Repository
 {
-    private $app;
     private $connection;
     private $table = 'snapshots_player';
     private $serializer;
     private $snapshot_factory;
 
     public function __construct(
-        Application $app,
         Factory $snapshot_factory,
         Serializer $serializer
     )
     {
-        $this->app = $app;
-        $this->connection = $app->make('db');
+        $this->connection = DB::connection();
         $this->snapshot_factory = $snapshot_factory;
         $this->serializer = $serializer;
     }

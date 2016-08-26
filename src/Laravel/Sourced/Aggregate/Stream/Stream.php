@@ -13,7 +13,7 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
     private $binary_string_factory;
 
     private $aggregate_id;
-    private $aggregate_type_id;
+    private $aggregate_type;
 
     private $starting_offset;
     private $current_offset;
@@ -25,7 +25,7 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
         EventSnapshotFactory $event_snapshot_factory,
         BinaryString\Factory $binary_string_factory,
         Identifier $aggregate_id,
-        Identifier $aggregate_type_id,
+        Identifier $aggregate_type,
         Integer_ $starting_offset,
         Integer_  $limit,
         Integer_ $chunk_size
@@ -35,7 +35,7 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
         $this->binary_string_factory = $binary_string_factory;
 
         $this->aggregate_id = $aggregate_id;
-        $this->aggregate_type_id = $aggregate_type_id;        
+        $this->aggregate_type = $aggregate_type;
         
         $this->starting_offset = $starting_offset;
         $this->current_offset = $starting_offset;
@@ -66,8 +66,8 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
                 $this->binary_string_factory->uuid($this->aggregate_id)
             )
             ->where(
-                "aggregate_type_id",
-                $this->binary_string_factory->uuid($this->aggregate_type_id)
+                "aggregate_type",
+                $this->aggregate_type->value()
             )
             ->orderBy("order")
             ->limit($this->chunk_size->value())

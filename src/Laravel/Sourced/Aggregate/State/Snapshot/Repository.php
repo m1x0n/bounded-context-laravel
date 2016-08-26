@@ -4,7 +4,6 @@ use EventSourced\ValueObject\Contracts\ValueObject\Identifier;
 use BoundedContext\Contracts\Sourced\Aggregate\State\Snapshot\Factory as StateSnapshotFactory;
 use BoundedContext\Contracts\Sourced\Aggregate\State\Snapshot\Snapshot;
 use BoundedContext\Laravel\Illuminate\Projection\AbstractQueryable;
-use Illuminate\Contracts\Foundation\Application;
 use EventSourced\ValueObject\Serializer\Serializer;
 
 class Repository extends AbstractQueryable implements \BoundedContext\Contracts\Sourced\Aggregate\State\Snapshot\Repository
@@ -14,28 +13,27 @@ class Repository extends AbstractQueryable implements \BoundedContext\Contracts\
     protected $serializer;
     
     public function __construct(
-        Application $app, 
         StateSnapshotFactory $state_snapshot_factory,
         Serializer $serializer)
     {
-        parent::__construct($app);
+        parent::__construct();
 
         $this->state_snapshot_factory = $state_snapshot_factory;
         $this->serializer = $serializer;
     }
 
-    public function ids(Identifier $aggregate_id, Identifier $aggregate_type_id)
+    public function ids(Identifier $aggregate_id, Identifier $aggregate_type)
     {
         $snapshot_row = $this->query()
             ->where('aggregate_id', $aggregate_id->value())
-            ->where('aggregate_type_id', $aggregate_type_id->value())
+            ->where('aggregate_type', $aggregate_type->value())
             ->first()
         ;
 
         $snapshot_array = (array) $snapshot_row;
 
         if (!$snapshot_array) {
-            return $this->state_snapshot_factory->create($aggregate_id, $aggregate_type_id);
+            return $this->state_snapshot_factory->create($aggregate_id, $aggregate_type);
         }
 
         $snapshot_array['state'] = json_decode($snapshot_array['state'], true);
@@ -51,10 +49,10 @@ class Repository extends AbstractQueryable implements \BoundedContext\Contracts\
         
         $this->query()->getConnection()->statement(
           'INSERT INTO ' . $this->table .
-          ' (aggregate_id, aggregate_type_id, occurred_at, version, state) ' .
+          ' (aggregate_id, aggregate_type, occurred_at, version, state) ' .
             'VALUES( '
                 . '\'' . $snapshot->aggregate_id()->value() . '\','
-                . '\'' . $snapshot->aggregate_type_id()->value() . '\','
+                . '\'' . $snapshot->aggregate_type()->value() . '\','
                 . '\'' . $snapshot->occurred_at()->value() . '\','
                 . '\'' . $snapshot->version()->value() . '\','
                 . '\'' . $encoded_state . '\'' .

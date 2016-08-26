@@ -15,9 +15,7 @@ class Upgrader implements \BoundedContext\Contracts\Event\Snapshot\Upgrader
 
     public function snapshot(EventSnapshotContract $snapshot)
     {
-        $event_class = $this->event_map->get_class(
-            $snapshot->type_id()
-        );
+        $event_class = $snapshot->type()->to_event_class();
 
         $upgrader_class = preg_replace(
             array('/Command/', '/Event/'),
@@ -36,11 +34,10 @@ class Upgrader implements \BoundedContext\Contracts\Event\Snapshot\Upgrader
             $snapshot->id(),
             $upgrader->version(),
             $snapshot->occurred_at(),
-            $snapshot->type_id(),
             $snapshot->type(),
             $snapshot->command_id(),
             $snapshot->aggregate_id(),
-            $snapshot->aggregate_type_id(),
+            $snapshot->aggregate_type(),
             $upgrader->schema()
         );
     }

@@ -15,7 +15,7 @@ class CreateTableSnapshotsAggregateState extends Migration
         DB::statement("
             CREATE TABLE `snapshots_aggregate_state` (
                 `aggregate_id` varchar(36) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-                `aggregate_type_id` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
+                `aggregate_type` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
                 `occurred_at` datetime NOT NULL,
                 `version` int(11) NOT NULL DEFAULT '0',
                 `state` text COLLATE utf8_unicode_ci NOT NULL,

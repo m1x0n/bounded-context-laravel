@@ -5,7 +5,7 @@ use BoundedContext\Contracts\Command\Command;
 use BoundedContext\Contracts\Sourced\Log\Command as CommandLog;
 use BoundedContext\Contracts\Sourced\Aggregate\Repository as AggregateRepository;
 use BoundedContext\Laravel\Player\Collection\Builder as PlayerBuilder;
-use Illuminate\Database\Connection;
+use DB;
 
 class Dispatcher implements \BoundedContext\Contracts\Bus\Dispatcher
 {
@@ -15,13 +15,12 @@ class Dispatcher implements \BoundedContext\Contracts\Bus\Dispatcher
     private $player_builder;
 
     public function __construct(
-        Connection $connection,
         AggregateRepository $aggregate_repository,
         CommandLog $command_log,
         PlayerBuilder $player_builder
     )
     {
-        $this->connection = $connection;
+        $this->connection = DB::connection();
         $this->aggregate_repository = $aggregate_repository;
         $this->command_log = $command_log;
         $this->player_builder = $player_builder;
@@ -53,8 +52,7 @@ class Dispatcher implements \BoundedContext\Contracts\Bus\Dispatcher
     {
         $this->connection->beginTransaction();
 
-        foreach($commands as $command)
-        {
+        foreach ($commands as $command) {
             $this->run($command);
         }
 

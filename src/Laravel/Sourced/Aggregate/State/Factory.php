@@ -73,7 +73,7 @@ class Factory implements \BoundedContext\Contracts\Sourced\Aggregate\State\Facto
     {
         return new $this->state_class(
             $snapshot->aggregate_id(),
-            $snapshot->aggregate_type_id(),
+            $snapshot->aggregate_type(),
             $snapshot->version(),
             $projection
         );

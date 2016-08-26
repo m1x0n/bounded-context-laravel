@@ -34,7 +34,7 @@ class Command implements \BoundedContext\Contracts\Sourced\Log\Command
     private function encode_snapshot(\BoundedContext\Contracts\Command\Snapshot\Snapshot $snapshot)
     {
         return json_encode([
-            'type_id' => $snapshot->type_id()->value(),
+            'type' => $snapshot->type()->value(),
             'version' => $snapshot->version()->value(),
             'occurred_at' => $snapshot->occurred_at()->value(),
             'command' => $snapshot->schema()->data_tree()
