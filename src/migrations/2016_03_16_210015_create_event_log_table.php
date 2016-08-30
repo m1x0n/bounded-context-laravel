@@ -34,6 +34,6 @@ class CreateEventLogTable extends Migration
     public function down()
     {
         $table = config('logs.event_log.table_name');
-        Scheme::drop($table);
+        Schema::drop($table);
     }
 }

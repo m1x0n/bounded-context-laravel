@@ -27,6 +27,6 @@ class CreateCommandLogTable extends Migration
      */
     public function down()
     {
-        Scheme::drop("command_log");
+        Schema::drop("command_log");
     }
 }
