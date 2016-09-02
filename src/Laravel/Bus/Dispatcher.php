@@ -31,7 +31,7 @@ class Dispatcher implements \BoundedContext\Contracts\Bus\Dispatcher
         $aggregate = $this->aggregate_repository->by($command);
 
         $aggregate->handle($command);
-        
+
         $this->aggregate_repository->save($aggregate);
 
         $this->command_log->append($command);
@@ -46,6 +46,10 @@ class Dispatcher implements \BoundedContext\Contracts\Bus\Dispatcher
         $this->run($command);
         
         $this->connection->commit();
+
+        return $this->aggregate_repository
+            ->event_log()
+            ->get_appended_events();
     }
 
     public function dispatch_collection(Collection $commands)

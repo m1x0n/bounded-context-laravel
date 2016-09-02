@@ -54,9 +54,9 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
 
         $this->unlock_rows($state->aggregate_id(), $state->aggregate_type());
     }
-        
-    private static $appended_events = [];
-   
+
+    protected static $appended_events = [];
+
     private function store_events(Aggregate $aggregate)
     {
         $events = $aggregate->changes();
@@ -81,7 +81,12 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
 
     private function encode_snapshot(Snapshot $snapshot)
     {
-        return json_encode([
+        return json_encode($this->snapshot_to_array($snapshot));
+    }
+
+    protected function snapshot_to_array(Snapshot $snapshot)
+    {
+        return [
             'id' => $snapshot->id()->value(),
             'type' => $snapshot->type()->value(),
             'aggregate_id' => $snapshot->aggregate_id()->value(),
@@ -90,7 +95,7 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
             'version' => $snapshot->version()->value(),
             'occurred_at' => $snapshot->occurred_at()->value(),
             'event' => $snapshot->schema()->data_tree()
-        ]);
+        ];
     }
 
     private function log_version($aggregate_id, $aggregate_type)
