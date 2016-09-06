@@ -49,9 +49,7 @@ class BoundedContextProvider extends ServiceProvider
     {
         // Loggable Class IDs to Class
         $this->app->singleton(\BoundedContext\Map\Map::class, function($app) {
-            $commands = (!Config::get('commands')) ? [] : Config::get('commands');
-            $events = (!Config::get('events')) ? [] : Config::get('events');
-            
+
             $player_environments = Config::get('players');
             
             $players_array = [];
@@ -63,10 +61,8 @@ class BoundedContextProvider extends ServiceProvider
                 }
             }
 
-            $map = array_merge($commands, $events, $players_array);
-            
             return new Map(
-                $map,
+                $players_array,
                 $this->app->make('BoundedContext\Contracts\Generator\Identifier')
             );
         });
@@ -208,7 +204,7 @@ class BoundedContextProvider extends ServiceProvider
 
         $this->app->bind(
             \BoundedContext\Contracts\Bus\Dispatcher::class,
-                \BoundedContext\Laravel\Bus\Dispatcher::class
+                \BoundedContext\Laravel\Bus\TransactionalDispatcher::class
         );
 
         $this->app->bind(

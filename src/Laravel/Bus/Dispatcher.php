@@ -9,7 +9,6 @@ use DB;
 
 class Dispatcher implements \BoundedContext\Contracts\Bus\Dispatcher
 {
-    private $connection;
     private $command_log;
     private $aggregate_repository;
     private $player_builder;
@@ -20,7 +19,6 @@ class Dispatcher implements \BoundedContext\Contracts\Bus\Dispatcher
         PlayerBuilder $player_builder
     )
     {
-        $this->connection = DB::connection();
         $this->aggregate_repository = $aggregate_repository;
         $this->command_log = $command_log;
         $this->player_builder = $player_builder;
@@ -41,11 +39,7 @@ class Dispatcher implements \BoundedContext\Contracts\Bus\Dispatcher
     
     public function dispatch(Command $command)
     {
-        $this->connection->beginTransaction();
-        
         $this->run($command);
-        
-        $this->connection->commit();
 
         return $this->aggregate_repository
             ->event_log()
@@ -54,12 +48,8 @@ class Dispatcher implements \BoundedContext\Contracts\Bus\Dispatcher
 
     public function dispatch_collection(Collection $commands)
     {
-        $this->connection->beginTransaction();
-
         foreach ($commands as $command) {
             $this->run($command);
         }
-
-        $this->connection->commit();
     }
 }

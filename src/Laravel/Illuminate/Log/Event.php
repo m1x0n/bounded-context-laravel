@@ -67,26 +67,21 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
         $inserts = [];
         foreach ($events as $event) {
             $snapshot = $this->snapshot_factory->event($event);
-            $encoded_snapshot = $this->encode_snapshot($snapshot);
+            $popo_snapshot = $this->snapshot_to_popo($snapshot);
             $inserts[] = [
                 'id' => $this->binary_string_factory->uuid($event->id()),
                 'aggregate_id' => $binary_aggregate_id,
                 'aggregate_type' => $state->aggregate_type()->value(),
-                'snapshot' => $encoded_snapshot
+                'snapshot' => json_encode($popo_snapshot)
             ];
-            static::$appended_events[] = $encoded_snapshot;
+            static::$appended_events[] = $popo_snapshot;
         }
         $this->connection->table($this->log_table)->insert($inserts);
     }
 
-    private function encode_snapshot(Snapshot $snapshot)
+    protected function snapshot_to_popo(Snapshot $snapshot)
     {
-        return json_encode($this->snapshot_to_array($snapshot));
-    }
-
-    protected function snapshot_to_array(Snapshot $snapshot)
-    {
-        return [
+        return (object)[
             'id' => $snapshot->id()->value(),
             'type' => $snapshot->type()->value(),
             'aggregate_id' => $snapshot->aggregate_id()->value(),
