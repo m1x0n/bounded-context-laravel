@@ -34,7 +34,7 @@ class Dispatcher implements \BoundedContext\Contracts\Bus\Dispatcher
 
         $this->command_log->append($command);
         
-        $this->player_builder->all()->get()->play();
+        $this->player_builder->domain()->get()->play();
     }
     
     public function dispatch(Command $command)

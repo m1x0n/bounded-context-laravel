@@ -1,30 +1,33 @@
 <?php namespace BoundedContext\Laravel\Player;
 
-use BoundedContext\Map\Map;
+use BoundedContext\Contracts\Generator\DateTime as DateTimeGenerator;
+use BoundedContext\Contracts\Generator\Identifier as IdentifierGenerator;
 use BoundedContext\Contracts\Player\Snapshot\Snapshot;
+use BoundedContext\Player\Snapshot\Snapshot as PlayerSnapshot;
 use BoundedContext\Contracts\Projection\Projection;
 use BoundedContext\Contracts\Sourced\Log\Event as EventLog;
 use App;
 
 class Factory implements \BoundedContext\Contracts\Player\Factory
 {
-    private $players_map;
     private $event_log;
+    private $datetime_generator;
+    private $identifier_generator;
 
-    public function __construct(Map $players_map, EventLog $event_log)
+    public function __construct(
+        EventLog $event_log,
+        DateTimeGenerator $datetime_generator,
+        IdentifierGenerator $identifier_generator
+    )
     {
-        $this->players_map = $players_map;
         $this->event_log = $event_log;
-    }
-
-    private function get_implementation_by_interface($interface_class)
-    {
-        return str_replace('Projector', 'Projection', $interface_class);
+        $this->datetime_generator = $datetime_generator;
+        $this->identifier_generator = $identifier_generator;
     }
 
     public function snapshot(Snapshot $snapshot)
     {
-        $player_class = $this->players_map->get_class($snapshot->id());
+        $player_class = $snapshot->class_name()->value();
 
         $reflection = new \ReflectionClass($player_class);
         $parameters = $reflection->getConstructor()->getParameters();
@@ -49,5 +52,16 @@ class Factory implements \BoundedContext\Contracts\Player\Factory
         }
 
         return $reflection->newInstanceArgs($args);
+    }
+
+    private function get_implementation_by_interface($interface_class)
+    {
+        return str_replace('Projector', 'Projection', $interface_class);
+    }
+
+    public function make($class_name)
+    {
+        $snapshot = PlayerSnapshot::make($class_name, $this->identifier_generator, $this->datetime_generator);
+        return $this->snapshot($snapshot);
     }
 }

@@ -1,41 +1,68 @@
 <?php namespace BoundedContext\Laravel\Player\Collection;
 
 use BoundedContext\Collection\Collection;
-use EventSourced\ValueObject\ValueObject\Uuid;
 use BoundedContext\Player\Collection\Player;
-use Illuminate\Support\Facades\Config;
 use BoundedContext\Player\Repository;
+use BoundedContext\Player\Snapshot\ClassName;
 
 class Builder
 {
     protected $repository;
     protected $players;
+    protected $config;
 
     public function __construct(Repository $repository)
     {
         $this->repository = $repository;
         $this->players = new Collection();
+        $this->config = config('players');
     }
 
     public function all()
     {
         $this->players = new Collection();
 
-        $player_spaces = Config::get('players');
+        $this->prepare_type($this->config->application);
+        $this->prepare_type($this->config->domain);
 
-        foreach($player_spaces as $player_space => $player_types)
-        {
-            foreach($player_types as $player_type)
-            {
-                foreach($player_type as $player_id => $player_namespace)
-                {
-                    $this->players->append(
-                        new Uuid($player_id)
-                    );
+        return $this;
+    }
+
+    private function prepare_type($players)
+    {
+        foreach($players as $player_type) {
+            foreach($player_type as $player_namespace) {
+                $this->players->append( new ClassName($player_namespace) );
+            }
+        }
+    }
+
+    public function application()
+    {
+        $this->players = new Collection();
+        $this->prepare_type($this->config['application']);
+        return $this;
+    }
+
+    public function domain()
+    {
+        $this->players = new Collection();
+        $this->prepare_type($this->config['domain']);
+        return $this;
+    }
+
+    public function projectors()
+    {
+        $this->players = new Collection();
+        foreach ($this->config as $layer_players) {
+            foreach ($layer_players as $type=>$players) {
+                if ($type == 'projectors') {
+                    foreach ($players as $player_namespace) {
+                        $this->players->append(new ClassName($player_namespace));
+                    }
                 }
             }
         }
-
         return $this;
     }
 

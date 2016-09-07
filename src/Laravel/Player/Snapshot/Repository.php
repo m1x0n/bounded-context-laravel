@@ -1,15 +1,15 @@
 <?php namespace BoundedContext\Laravel\Player\Snapshot;
 
 use BoundedContext\Contracts\Player\Snapshot\Snapshot;
-use EventSourced\ValueObject\Contracts\ValueObject\Identifier;
 use BoundedContext\Player\Snapshot\Factory;
 use EventSourced\ValueObject\Serializer\Serializer;
 use DB;
+use BoundedContext\Player\Snapshot\ClassName;
 
 class Repository implements \BoundedContext\Contracts\Player\Snapshot\Repository
 {
     private $connection;
-    private $table = 'snapshots_player';
+    private $table = 'player_snapshots';
     private $serializer;
     private $snapshot_factory;
 
@@ -28,25 +28,33 @@ class Repository implements \BoundedContext\Contracts\Player\Snapshot\Repository
         return $this->connection->table($this->table);
     }
 
-    public function get(Identifier $id)
+    public function get(ClassName $class_name)
     {
         $row = $this->query()
             ->sharedLock()
-            ->where('id', $id->value())
+            ->where('class_name', $class_name->value())
             ->first();
 
         if (!$row) {
-            throw new \Exception("The Player Snapshot [".$id->value()."] does not exist.");
+            return null;
         }
 
         $row_array = (array) $row;
         return $this->snapshot_factory->make($row_array);
     }
 
+    public function create(Snapshot $snapshot)
+    {
+        $this->query()
+            ->insert(
+                $this->serializer->serialize($snapshot)
+            );
+    }
+
     public function save(Snapshot $snapshot)
     {
         $this->query()
-            ->where('id', $snapshot->id()->value())
+            ->where('class_name', $snapshot->class_name()->value())
             ->update(
                 $this->serializer->serialize($snapshot)
             );

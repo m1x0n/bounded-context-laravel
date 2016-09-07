@@ -2,8 +2,9 @@
 
 use Illuminate\Database\Query\Builder;
 use DB;
+use BoundedContext\Contracts\Projection\Queryable;
 
-abstract class AbstractQueryable
+abstract class AbstractQueryable implements Queryable
 {
     protected $connection;
     protected $table = 'projection_table';

@@ -166,7 +166,7 @@ class BoundedContextProvider extends ServiceProvider
         if (is_null($projection_types)) {
             return;
         }
-        
+
         foreach ($projection_types as $projection_type) {
             foreach ($projection_type as $projection => $implemented_projection) {
                 $queryable =
