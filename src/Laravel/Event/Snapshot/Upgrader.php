@@ -23,6 +23,15 @@ class Upgrader implements \BoundedContext\Contracts\Event\Snapshot\Upgrader
             $event_class
         );
 
+        if (class_exists($upgrader_class)) {
+            return $this->upgradeSnapshot($upgrader_class, $snapshot);
+        }
+
+        return $snapshot;
+    }
+
+    private function upgradeSnapshot($upgrader_class, $snapshot)
+    {
         $upgrader = new $upgrader_class(
             $snapshot->schema(),
             $snapshot->version()
