@@ -4,21 +4,25 @@ use BoundedContext\Contracts\Business\Invariant\Factory as InvariantFactory;
 use BoundedContext\Contracts\Sourced\Aggregate\Type\Factory as TypeFactory;
 use BoundedContext\Contracts\Sourced\Aggregate\State\State;
 use BoundedContext\Contracts\Generator;
+use BoundedContext\Laravel\Sourced\Aggregate\Projection;
 
 class Factory implements \BoundedContext\Contracts\Sourced\Aggregate\Factory
 {
     protected $type_factory;
     protected $invariant_factory;
     protected $id_generator;
+    protected $projection_factory;
 
     public function __construct(
         TypeFactory $type_factory,
         InvariantFactory $invariant_factory,
-        Generator\Identifier $id_generator)
+        Generator\Identifier $id_generator,
+        Projection\Factory $projection_factory)
     {
         $this->type_factory = $type_factory;
         $this->invariant_factory = $invariant_factory;
         $this->id_generator = $id_generator;
+        $this->projection_factory = $projection_factory;
     }
 
     public function state(State $state)
@@ -37,6 +41,7 @@ class Factory implements \BoundedContext\Contracts\Sourced\Aggregate\Factory
             $this->type_factory,
             $this->invariant_factory,
             $this->id_generator,
+            $this->projection_factory,
             $state
         );
     }

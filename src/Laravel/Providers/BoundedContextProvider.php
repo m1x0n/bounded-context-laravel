@@ -1,6 +1,4 @@
-<?php
-
-namespace BoundedContext\Laravel\Providers;
+<?php namespace BoundedContext\Laravel\Providers;
 
 use BoundedContext\Map\Map;
 use Illuminate\Support\Facades\Config;
@@ -235,6 +233,11 @@ class BoundedContextProvider extends ServiceProvider
         $this->app->bind(
             \BoundedContext\Contracts\Sourced\Aggregate\Type\Factory::class,
                 \BoundedContext\Sourced\Aggregate\Type\Factory::class
+        );
+
+        $this->app->bind(
+            \BoundedContext\Sourced\Aggregate\Projection\Factory::class,
+                \BoundedContext\Laravel\Sourced\Aggregate\Projection\Factory::class
         );
         
         $this->app->bind(
