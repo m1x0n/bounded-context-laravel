@@ -13,6 +13,7 @@ use EventSourced\ValueObject\ValueObject\Integer as Integer_;
 use EventSourced\ValueObject\Serializer\Serializer;
 use BoundedContext\Event\Type as EventType;
 use BoundedContext\Event\AggregateType;
+use BoundedContext\Event\CaseTransformer;
 
 class Factory implements \BoundedContext\Contracts\Event\Snapshot\Factory, \BoundedContext\Contracts\Command\Snapshot\Factory
 {
@@ -64,16 +65,10 @@ class Factory implements \BoundedContext\Contracts\Event\Snapshot\Factory, \Boun
             new Schema($serialized)
         );
     }
-    
+
     private function event_type($event)
     {
-        $class = strtolower(get_class($event));
-        $parts = explode("\\", $class);
-        unset($parts[0]);
-        unset($parts[3]);
-        unset($parts[5]);
-        $parts = array_values($parts);
-        return new EventType(implode(".", $parts));
+        return EventType::from_event($event);
     }
 
     public function schema(SchemaContract $schema)
