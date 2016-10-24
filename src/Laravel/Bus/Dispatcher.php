@@ -40,10 +40,6 @@ class Dispatcher implements \BoundedContext\Contracts\Bus\Dispatcher
     public function dispatch(Command $command)
     {
         $this->run($command);
-
-        return $this->aggregate_repository
-            ->event_log()
-            ->get_appended_events();
     }
 
     public function dispatch_collection(Collection $commands)

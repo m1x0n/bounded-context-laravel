@@ -12,11 +12,9 @@ class TransactionalDispatcher extends Dispatcher
 
         $connection->beginTransaction();
 
-        $events = parent::dispatch($command);
+        parent::dispatch($command);
 
         $connection->commit();
-
-        return $events;
     }
 
     public function dispatch_collection(Collection $commands)
