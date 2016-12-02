@@ -1,6 +1,6 @@
 <?php namespace BoundedContext\Laravel\Providers;
 
-use BoundedContext\Map\Map;
+use BoundedContext\Laravel\Player\RegisteredList;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 
@@ -45,26 +45,6 @@ class BoundedContextProvider extends ServiceProvider
      */
     public function register()
     {
-        // Loggable Class IDs to Class
-        $this->app->singleton(\BoundedContext\Map\Map::class, function($app) {
-
-            $player_environments = Config::get('players');
-            
-            $players_array = [];
-            foreach($player_environments as $player_environment) {
-                foreach($player_environment as $player_types) {
-                    foreach($player_types as $id => $player) {
-                        $players_array[$id] = $player;
-                    }
-                }
-            }
-
-            return new Map(
-                $players_array,
-                $this->app->make('BoundedContext\Contracts\Generator\Identifier')
-            );
-        });
-
         $this->app->bind(
             \BoundedContext\Contracts\Event\Snapshot\Factory::class,
                 \BoundedContext\Laravel\Event\Snapshot\Factory::class
@@ -159,32 +139,14 @@ class BoundedContextProvider extends ServiceProvider
             \BoundedContext\Laravel\Player\Snapshot\Repository::class
         );
 
-        $projection_types = Config::get('projections');
+        $this->app->singleton(RegisteredList::class, function(){
+            return new RegisteredList();
+        });
 
-        if (is_null($projection_types)) {
-            return;
-        }
+        $player_registerer = $this->app->make(Registerer::class);
 
-        foreach ($projection_types as $projection_type) {
-            foreach ($projection_type as $projection => $implemented_projection) {
-                $queryable =
-                    '\\' .
-                    chop($projection, 'Projection') .
-                    "Queryable";
-
-                $implemented_queryable =
-                    chop($implemented_projection, 'Projection') .
-                    "Queryable";
-                
-                $this->app
-                    ->when($implemented_projection)
-                    ->needs(\BoundedContext\Contracts\Projection\Queryable::class)
-                    ->give($implemented_queryable);
-
-                $this->app->singleton($projection, $implemented_projection);
-                $this->app->singleton($queryable, $implemented_queryable);
-            }
-        }
+        $player_registerer->register_players( Config::get('players') );
+        $player_registerer->register_projection_implementations($this->app, Config::get('projections'));
 
         $this->app->bind(
             \BoundedContext\Contracts\Player\Factory::class,

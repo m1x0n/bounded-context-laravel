@@ -4,6 +4,7 @@ use BoundedContext\Collection\Collection;
 use BoundedContext\Player\Collection\Player;
 use BoundedContext\Player\Repository;
 use BoundedContext\Player\Snapshot\ClassName;
+use BoundedContext\Laravel\Player\RegisteredList;
 
 class Builder
 {
@@ -11,11 +12,11 @@ class Builder
     protected $players;
     protected $config;
 
-    public function __construct(Repository $repository)
+    public function __construct(Repository $repository, RegisteredList $list)
     {
         $this->repository = $repository;
         $this->players = new Collection();
-        $this->config = config('players');
+        $this->config = $list->all();
     }
 
     public function all()
