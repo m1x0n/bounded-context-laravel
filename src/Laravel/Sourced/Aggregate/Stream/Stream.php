@@ -1,7 +1,6 @@
 <?php namespace BoundedContext\Laravel\Sourced\Aggregate\Stream;
 
 use EventSourced\ValueObject\Contracts\ValueObject\Identifier;
-use BoundedContext\Laravel\Event\Snapshot\Factory as EventSnapshotFactory;
 use BoundedContext\Sourced\Stream\AbstractStream;
 use EventSourced\ValueObject\ValueObject\Integer as Integer_;
 use Illuminate\Database\ConnectionInterface;
@@ -11,10 +10,8 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
 {
     private $connection;
     private $binary_string_factory;
-
     private $aggregate_id;
     private $aggregate_type;
-
     private $starting_offset;
     private $current_offset;
     
@@ -22,7 +19,6 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
 
     public function __construct(
         ConnectionInterface $connection,
-        EventSnapshotFactory $event_snapshot_factory,
         BinaryString\Factory $binary_string_factory,
         Identifier $aggregate_id,
         Identifier $aggregate_type,
@@ -43,7 +39,6 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
         $this->log_table = config('logs.event_log.table_name');
 
         parent::__construct(
-            $event_snapshot_factory,
             $limit,
             $chunk_size
         );

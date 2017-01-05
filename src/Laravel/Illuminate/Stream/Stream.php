@@ -3,8 +3,6 @@
 use EventSourced\ValueObject\Contracts\ValueObject\Identifier;
 use BoundedContext\Sourced\Stream\AbstractStream;
 use EventSourced\ValueObject\ValueObject\Integer as Integer_;
-
-use BoundedContext\Laravel\Event\Snapshot\Factory as EventSnapshotFactory;
 use Illuminate\Database\ConnectionInterface;
 use BoundedContext\Laravel\Illuminate\BinaryString;
 
@@ -12,14 +10,12 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
 {
     private $connection;
     private $binary_string_factory;
-
     private $starting_id;
     private $order_offset;
     private $log_table;
 
     public function __construct(
         ConnectionInterface $connection,
-        EventSnapshotFactory $event_snapshot_factory,
         BinaryString\Factory $binary_string_factory,
         Identifier $starting_id,
         Integer_  $limit,
@@ -36,7 +32,6 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
         $this->reset();
         
         parent::__construct(
-            $event_snapshot_factory,
             $limit,
             $chunk_size
         );
