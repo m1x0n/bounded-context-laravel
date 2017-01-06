@@ -27,5 +27,6 @@
     "psr-4": {
       "BoundedContext\\Laravel\\": "src/Laravel/"
     }
-  }
+  },
+  "minimum-stability": "dev"
 }
