@@ -4,7 +4,7 @@ class DateTime implements \BoundedContext\Contracts\Generator\DateTime
 {
     public function now()
     {
-        $datetime = date("Y-m-d H:i:s");
+        $datetime = date(\DateTime::ISO8601);
         return new \EventSourced\ValueObject\ValueObject\DateTime($datetime);
     }
 
