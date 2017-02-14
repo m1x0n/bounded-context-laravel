@@ -31,7 +31,6 @@ class Repository implements \BoundedContext\Contracts\Player\Snapshot\Repository
     public function get(ClassName $class_name)
     {
         $row = $this->query()
-            ->sharedLock()
             ->where('class_name', $class_name->value())
             ->first();
 
