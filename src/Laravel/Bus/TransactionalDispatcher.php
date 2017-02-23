@@ -12,9 +12,13 @@ class TransactionalDispatcher extends Dispatcher
 
         $connection->beginTransaction();
 
-        parent::dispatch($command);
-
-        $connection->commit();
+        try {
+            parent::dispatch($command);
+            $connection->commit();
+        } catch (\Exception $e) {
+            $connection->rollback();
+            throw $e;
+        }
     }
 
     public function dispatch_collection(Collection $commands)
@@ -23,8 +27,12 @@ class TransactionalDispatcher extends Dispatcher
 
         $connection->beginTransaction();
 
-        parent::dispatch_collection($commands);
-
-        $connection->commit();
+        try {
+            parent::dispatch_collection($commands);
+            $connection->commit();
+        } catch (\Exception $e) {
+            $connection->rollback();
+            throw $e;
+        }
     }
 }
