@@ -1,6 +1,7 @@
 <?php namespace BoundedContext\Laravel\Illuminate\Log;
 
 use BoundedContext\Contracts\Event\Snapshot\Factory;
+use BoundedContext\Laravel\Serializer\ErrorAwareJsonSerializer;
 use Illuminate\Database\DatabaseManager;
 use BoundedContext\Sourced\Stream\Builder;
 use BoundedContext\Laravel\Illuminate\BinaryString;
@@ -17,12 +18,14 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
     private $binary_string_factory;
     private $stream_builder;
     private $log_table;
+    private $json_serializer;
 
     public function __construct(
         Factory $snapshot_factory,
         DatabaseManager $db_manager,
         Builder $stream_builder,
-        BinaryString\Factory $binary_string_factory
+        BinaryString\Factory $binary_string_factory,
+        ErrorAwareJsonSerializer $json_serializer
     )
     {
         $this->snapshot_factory = $snapshot_factory;
@@ -30,6 +33,7 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
         $this->binary_string_factory = $binary_string_factory;
         $this->stream_builder = $stream_builder;
         $this->log_table = config('logs.event_log.table_name');
+        $this->json_serializer = $json_serializer;
     }
 
     public function append_aggregate_events(Aggregate $aggregate)
@@ -72,7 +76,7 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
                 'id' => $this->binary_string_factory->uuid($event->id()),
                 'aggregate_id' => $binary_aggregate_id,
                 'aggregate_type' => $state->aggregate_type()->value(),
-                'snapshot' => json_encode($popo_snapshot)
+                'snapshot' => $this->json_serializer->serialize($popo_snapshot)
             ];
             static::$appended_events[] = $popo_snapshot;
         }
