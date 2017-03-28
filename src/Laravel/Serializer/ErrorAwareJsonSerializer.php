@@ -6,7 +6,7 @@ class ErrorAwareJsonSerializer
 {
     public function serialize($serializable)
     {
-        $result = @json_encode($serializable);
+        $result = json_encode($serializable);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new JsonSerializationException(
@@ -19,7 +19,7 @@ class ErrorAwareJsonSerializer
 
     public function deserialize($serialized, $toArray = false)
     {
-        $result = @json_decode($serialized, $toArray);
+        $result = json_decode($serialized, $toArray);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new JsonDeserializationException(
