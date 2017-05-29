@@ -91,42 +91,6 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
         ];
     }
 
-    private function log_version($aggregate_id, $aggregate_type)
-    {
-        $binary_aggregate_id = $this->binary_string_factory->uuid($aggregate_id);
-
-        $query = $this->connection
-            ->table($this->log_table)
-            ->selectRaw("COUNT(*) as version")
-            ->where("aggregate_id", $binary_aggregate_id)
-            ->where("aggregate_type", $aggregate_type->value());
-
-        $row = $query->first();
-
-        return new Integer($row->version);
-    }
-
-    private function lock_rows(Uuid $id, AggregateType $type)
-    {
-        $this->connection->raw(
-            "SELECT GET_LOCK(:lockid, 1)",
-            ['lockid'=> $this->lock_id($id, $type)]
-        );
-    }
-
-    private function unlock_rows(Uuid $id, AggregateType $type)
-    {
-        $this->connection->raw(
-            "SELECT RELEASE_LOCK(:lockid)",
-            ['lockid'=> $this->lock_id($id, $type)]
-        );
-    }
-
-    private function lock_id(Uuid $id, AggregateType $type)
-    {
-        return $id->value().'-'.$type->value();
-    }
-
     public function builder()
     {
         return $this->stream_builder;
