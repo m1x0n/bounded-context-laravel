@@ -48,14 +48,13 @@ class Repository extends AbstractQueryable implements \BoundedContext\Contracts\
         $encoded_state = json_encode($snapshot->schema()->data_tree());
 
         $this->query()->getConnection()->statement(
-            "INSERT INTO :snapshot_state_table
+            "INSERT INTO $this->table
                 (aggregate_id, aggregate_type, occurred_at, version, state)
             VALUES (:aggregate_id, :aggregate_type, :occurred_at, :version, :state)
             ON DUPLICATE KEY UPDATE
                 occurred_at = :occurred_at,
                 version = :version,
                 state = :state", [
-            'snapshot_state_table' => $this->table,
             'aggregate_id' => $snapshot->aggregate_id()->value(),
             'aggregate_type' => $snapshot->aggregate_type()->value(),
             'occurred_at' => $snapshot->occurred_at()->value(),
