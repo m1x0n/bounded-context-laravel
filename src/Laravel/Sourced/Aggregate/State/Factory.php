@@ -3,6 +3,7 @@
 use BoundedContext\Contracts\Command\Command;
 use BoundedContext\Contracts\Sourced\Aggregate\State\Snapshot\Snapshot;
 use EventSourced\ValueObject\Deserializer\Deserializer;
+use BoundedContext\Laravel\Sourced\Aggregate\Locker;
 
 class Factory implements \BoundedContext\Contracts\Sourced\Aggregate\State\Factory
 {
@@ -10,8 +11,9 @@ class Factory implements \BoundedContext\Contracts\Sourced\Aggregate\State\Facto
 
     protected $state_class;
     protected $state_projection_class;
+    protected $locker;
 
-    public function __construct(Deserializer $deserializer)
+    public function __construct(Deserializer $deserializer, Locker $locker)
     {
         $this->deserializer = $deserializer;
     }
@@ -66,7 +68,11 @@ class Factory implements \BoundedContext\Contracts\Sourced\Aggregate\State\Facto
                 $snapshot->schema()->$property_name
             );
         }
-        return $this->create_state($snapshot, $projection);
+        $state = $this->create_state($snapshot, $projection);
+
+        $this->locker->unlock($state->aggregate_id(), $state->aggregate_type());
+
+        return $state;
     }
     
     private function create_state($snapshot, $projection) 
