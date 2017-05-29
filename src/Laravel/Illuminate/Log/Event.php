@@ -2,6 +2,7 @@
 
 use BoundedContext\Contracts\Event\Snapshot\Factory;
 use BoundedContext\Laravel\Serializer\ErrorAwareJsonSerializer;
+use BoundedContext\Laravel\Sourced\Aggregate\Locker;
 use Illuminate\Database\DatabaseManager;
 use BoundedContext\Sourced\Stream\Builder;
 use BoundedContext\Laravel\Illuminate\BinaryString;
@@ -19,13 +20,15 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
     private $stream_builder;
     private $log_table;
     private $json_serializer;
+    private $locker;
 
     public function __construct(
         Factory $snapshot_factory,
         DatabaseManager $db_manager,
         Builder $stream_builder,
         BinaryString\Factory $binary_string_factory,
-        ErrorAwareJsonSerializer $json_serializer
+        ErrorAwareJsonSerializer $json_serializer,
+        Locker $locker
     )
     {
         $this->snapshot_factory = $snapshot_factory;
@@ -34,6 +37,7 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
         $this->stream_builder = $stream_builder;
         $this->log_table = config('logs.event_log.table_name');
         $this->json_serializer = $json_serializer;
+        $this->locker = $locker;
     }
 
     public function append_aggregate_events(Aggregate $aggregate)
@@ -44,19 +48,9 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
 
         $state = $aggregate->state();
 
-        $this->lock_rows($state->aggregate_id(), $state->aggregate_type());
-
-        $loaded_log_version = $state->version()->subtract($aggregate->changes()->count());
-        $current_log_version = $this->log_version($state->aggregate_id(), $state->aggregate_type());
-
-        if (!$loaded_log_version->equals($current_log_version)) {
-            $this->unlock_rows($state->aggregate_id(), $state->aggregate_type());
-            throw new \Exception("Aggregate has already been updated during this transation by another thread.");
-        }
-
         $this->store_events($aggregate);
 
-        $this->unlock_rows($state->aggregate_id(), $state->aggregate_type());
+        $this->locker->unlock($state->aggregate_id(), $state->aggregate_type());
     }
 
     protected static $appended_events = [];
@@ -95,42 +89,6 @@ class Event implements \BoundedContext\Contracts\Sourced\Log\Event
             'occurred_at' => $snapshot->occurred_at()->value(),
             'event' => $snapshot->schema()->data_tree()
         ];
-    }
-
-    private function log_version($aggregate_id, $aggregate_type)
-    {
-        $binary_aggregate_id = $this->binary_string_factory->uuid($aggregate_id);
-
-        $query = $this->connection
-            ->table($this->log_table)
-            ->selectRaw("COUNT(*) as version")
-            ->where("aggregate_id", $binary_aggregate_id)
-            ->where("aggregate_type", $aggregate_type->value());
-
-        $row = $query->first();
-
-        return new Integer($row->version);
-    }
-
-    private function lock_rows(Uuid $id, AggregateType $type)
-    {
-        $this->connection->raw(
-            "SELECT GET_LOCK(:lockid, 1)",
-            ['lockid'=> $this->lock_id($id, $type)]
-        );
-    }
-
-    private function unlock_rows(Uuid $id, AggregateType $type)
-    {
-        $this->connection->raw(
-            "SELECT RELEASE_LOCK(:lockid)",
-            ['lockid'=> $this->lock_id($id, $type)]
-        );
-    }
-
-    private function lock_id(Uuid $id, AggregateType $type)
-    {
-        return $id->value().'-'.$type->value();
     }
 
     public function builder()
