@@ -17,7 +17,8 @@ class Factory implements \BoundedContext\Contracts\Sourced\Aggregate\Factory
         TypeFactory $type_factory,
         InvariantFactory $invariant_factory,
         Generator\Identifier $id_generator,
-        Projection\Factory $projection_factory)
+        Projection\Factory $projection_factory
+    )
     {
         $this->type_factory = $type_factory;
         $this->invariant_factory = $invariant_factory;

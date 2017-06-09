@@ -18,6 +18,8 @@ class Factory implements \BoundedContext\Contracts\Sourced\Aggregate\Stream\Fact
         Integer_ $chunk_size
     )
     {
+        // TODO: All dependencies should be injected, rather than using App::make, it's horrible and inconsistent
+
         $aggregate_stream = new AggregateStream(
             DB::connection(),
             App::make(\BoundedContext\Laravel\Illuminate\BinaryString\Factory::class),
