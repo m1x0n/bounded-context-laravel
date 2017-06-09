@@ -223,6 +223,11 @@ class BoundedContextProvider extends ServiceProvider
         );
 
         $this->app->bind(
+            \EventSourced\ValueObject\Contracts\MethodDeserializer::class,
+            \EventSourced\ValueObject\Deserializer\Deserializer::class
+        );
+
+        $this->app->bind(
             \BoundedContext\Sourced\Stream\Upgrader::class,
                 \BoundedContext\Sourced\Stream\DefaultUpgrader::class
         );
