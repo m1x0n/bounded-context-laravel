@@ -30,6 +30,16 @@ class Factory implements \BoundedContext\Contracts\Sourced\Aggregate\State\Facto
         return $this;
     }
 
+    public function aggregateClass(string $class)
+    {
+        $aggregate_prefix = substr($class, 0, strlen($class) - strlen("Aggregate"));
+
+        $this->state_class = $aggregate_prefix . 'Projector';
+        $this->state_projection_class = $aggregate_prefix . 'Projection';
+
+        return $this;
+    }
+
     private function parse_doc_comment($doc_comment)
     {
         $clean_doc_comment = trim(preg_replace('/\r?\n *\* *\//', '', $doc_comment));
