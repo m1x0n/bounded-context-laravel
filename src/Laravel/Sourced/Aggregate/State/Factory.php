@@ -30,7 +30,7 @@ class Factory implements \BoundedContext\Contracts\Sourced\Aggregate\State\Facto
         return $this;
     }
 
-    public function aggregateClass(string $class)
+    public function aggregateClass($class)
     {
         $aggregate_prefix = substr($class, 0, strlen($class) - strlen("Aggregate"));
 
