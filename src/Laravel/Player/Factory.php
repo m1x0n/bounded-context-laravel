@@ -62,6 +62,8 @@ class Factory implements \BoundedContext\Contracts\Player\Factory
     public function make($class_name)
     {
         $snapshot = PlayerSnapshot::make($class_name, $this->identifier_generator, $this->datetime_generator);
-        return $this->snapshot($snapshot);
+        $player = $this->snapshot($snapshot);
+        $player->reset();
+        return $player;
     }
 }
