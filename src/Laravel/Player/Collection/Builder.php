@@ -52,6 +52,21 @@ class Builder
         return $this;
     }
 
+    public function versionChanged()
+    {
+        $players = new Collection();
+
+        foreach ($this->players as $player) {
+            if ($this->repository->hasVersionChanged($player)) {
+                $players->append($player);
+            }
+        }
+
+        $this->players = $players;
+
+        return $this;
+    }
+
     public function projectors()
     {
         $this->players = new Collection();
