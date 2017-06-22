@@ -8,20 +8,20 @@ class RenameVersionFields extends Migration
     public function up()
     {
         Schema::table('player_snapshots', function (Blueprint $table) {
-            $table->renameColumn('update_count', 'version');
+            $table->dropColumn('update_count');
         });
         Schema::table('player_snapshots', function (Blueprint $table) {
-            $table->integer('player')->default(1);
+            $table->integer('player_version')->default(1);
         });
     }
 
     public function down()
     {
         Schema::table('player_snapshots', function (Blueprint $table) {
-            $table->dropColumn('player');
+            $table->integer('update_count')->default(1);
         });
         Schema::table('player_snapshots', function (Blueprint $table) {
-            $table->renameColumn('version', 'update_count');
+            $table->dropColumn('player_version');
         });
     }
 }
