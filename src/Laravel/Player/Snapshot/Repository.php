@@ -30,8 +30,11 @@ class Repository implements \BoundedContext\Contracts\Player\Snapshot\Repository
 
     public function get(ClassName $class_name)
     {
+        $player_class = $class_name->value();
+
         $row = $this->query()
             ->where('class_name', $class_name->value())
+            ->where('player_version', $player_class::version())
             ->first();
 
         if (!$row) {
@@ -54,6 +57,7 @@ class Repository implements \BoundedContext\Contracts\Player\Snapshot\Repository
     {
         $this->query()
             ->where('class_name', $snapshot->class_name()->value())
+            ->where('player_version', $snapshot->playerVersion()->value())
             ->update(
                 $this->serializer->serialize($snapshot)
             );
