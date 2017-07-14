@@ -70,7 +70,7 @@ class Stream extends AbstractStream implements \BoundedContext\Contracts\Sourced
         }
 
         $rows = $query->get();
- 
+
         return $rows;
     }
     

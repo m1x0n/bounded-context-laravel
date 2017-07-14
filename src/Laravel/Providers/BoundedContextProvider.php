@@ -231,5 +231,10 @@ class BoundedContextProvider extends ServiceProvider
             \BoundedContext\Sourced\Stream\Upgrader::class,
                 \BoundedContext\Sourced\Stream\DefaultUpgrader::class
         );
+
+        $this->app->bind(
+            \BoundedContext\Contracts\Event\Snapshot\Transformer::class,
+                \BoundedContext\Event\Snapshot\Transformer::class
+        );
     }
 }

@@ -35,6 +35,8 @@ class Factory implements \BoundedContext\Contracts\Sourced\Aggregate\Stream\Fact
             App::make(\BoundedContext\Sourced\Stream\Upgrader::class)
         ]);
 
-        return new SnapshotStream($upgraded_stream);
+        $snapshot_transformer = App::make(\BoundedContext\Contracts\Event\Snapshot\Transformer::class);
+
+        return new SnapshotStream($snapshot_transformer, $upgraded_stream);
     }
 }
