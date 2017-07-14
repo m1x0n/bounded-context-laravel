@@ -8,6 +8,7 @@ use DB;
 use App;
 use BoundedContext\Laravel\Illuminate\Stream\Stream as LogStream;
 
+// Actor: TODO: Use injectable dependencies, instead of magic "App::make" bullshit
 class Factory implements \BoundedContext\Contracts\Sourced\Stream\Factory
 {
     public function create(
@@ -24,11 +25,12 @@ class Factory implements \BoundedContext\Contracts\Sourced\Stream\Factory
             $chunk_size
         );
 
-        $upgraded_stream = App::make(UpgradedStream::class, [
-            $log_stream,
-            App::make(\BoundedContext\Sourced\Stream\Upgrader::class)
-        ]);
+        $upgrader = App::make(\BoundedContext\Sourced\Stream\Upgrader::class);
 
-        return new SnapshotStream($upgraded_stream);
+        $upgraded_stream = new UpgradedStream($log_stream, $upgrader);
+
+        $snapshot_transformer = App::make(\BoundedContext\Contracts\Event\Snapshot\Transformer::class);
+
+        return new SnapshotStream($snapshot_transformer, $upgraded_stream);
     }
 }
