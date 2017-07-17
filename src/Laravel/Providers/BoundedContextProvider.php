@@ -98,7 +98,7 @@ class BoundedContextProvider extends ServiceProvider
 
         $this->app->bind(
             \BoundedContext\Contracts\Sourced\Aggregate\State\Snapshot\Repository::class,
-                \BoundedContext\Laravel\Sourced\Aggregate\State\Snapshot\Repository::class
+                \BoundedContext\Laravel\Sourced\Aggregate\State\Snapshot\DummyRepository::class
         );
 
         $this->app->bind(
