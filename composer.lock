@@ -4,71 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "7da60b1a610ac564cdc377a4c5eeb0ba",
-    "content-hash": "dec2bb65372d466e66da101a64c11e22",
+    "hash": "9eb819b791d4159eb5a77ce81eacc272",
+    "content-hash": "52f884a7799fa1a549273d8d3de44563",
     "packages": [
         {
-            "name": "dql/sourced",
-            "version": "2.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/barryosull/bounded-context.git",
-                "reference": "224d04276f94b18317395472ea354fba813e2035"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/barryosull/bounded-context/zipball/224d04276f94b18317395472ea354fba813e2035",
-                "reference": "224d04276f94b18317395472ea354fba813e2035",
-                "shasum": ""
-            },
-            "require": {
-                "dql/valueobjects": "~4.1",
-                "php": ">=5.4.0",
-                "ramsey/uuid": "~2.8"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "4.1.*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "BoundedContext\\": "src/",
-                    "BoundedContext\\Examples\\": "examples/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Colin Lyons",
-                    "email": "colin@tercet.io"
-                },
-                {
-                    "name": "Barry O'Sullivan",
-                    "email": "barry@tercet.io"
-                },
-                {
-                    "name": "Kiran Guragai",
-                    "email": "kiranguragai@gmail.com"
-                }
-            ],
-            "description": "A framework for event-sourced bounded contexts.",
-            "time": "2017-06-20 15:07:13"
-        },
-        {
             "name": "dql/valueobjects",
-            "version": "4.6.0",
+            "version": "4.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/barryosull/valueobjects.git",
-                "reference": "82c62b3810a924b16f02d82498b8cf1c3773195c"
+                "reference": "94919f25d4b87072289ebe2554b8cf5bb7d5c3d5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/barryosull/valueobjects/zipball/82c62b3810a924b16f02d82498b8cf1c3773195c",
-                "reference": "82c62b3810a924b16f02d82498b8cf1c3773195c",
+                "url": "https://api.github.com/repos/barryosull/valueobjects/zipball/94919f25d4b87072289ebe2554b8cf5bb7d5c3d5",
+                "reference": "94919f25d4b87072289ebe2554b8cf5bb7d5c3d5",
                 "shasum": ""
             },
             "require": {
@@ -106,7 +56,7 @@
                 }
             ],
             "description": "A helper library for making valueobjects",
-            "time": "2017-06-09 20:56:26"
+            "time": "2017-07-24 15:10:29"
         },
         {
             "name": "moneyphp/money",
@@ -114,12 +64,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/moneyphp/money.git",
-                "reference": "2bd76fb0ba281bd90150a747bb7a8415c7e241f3"
+                "reference": "c0e65a874ab8c9c9a239ac3b062cce70b35b1f27"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/moneyphp/money/zipball/2bd76fb0ba281bd90150a747bb7a8415c7e241f3",
-                "reference": "2bd76fb0ba281bd90150a747bb7a8415c7e241f3",
+                "url": "https://api.github.com/repos/moneyphp/money/zipball/c0e65a874ab8c9c9a239ac3b062cce70b35b1f27",
+                "reference": "c0e65a874ab8c9c9a239ac3b062cce70b35b1f27",
                 "shasum": ""
             },
             "require": {
@@ -184,7 +134,7 @@
                 "money",
                 "vo"
             ],
-            "time": "2017-04-26 12:54:44"
+            "time": "2017-07-25 21:00:56"
         },
         {
             "name": "nesbot/carbon",
@@ -483,12 +433,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/translation.git",
-                "reference": "f4a04d2df710f81515df576b2de06bdeee518b83"
+                "reference": "df36a48672b929bf3995eb62c58d83004b1d0d50"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/translation/zipball/f4a04d2df710f81515df576b2de06bdeee518b83",
-                "reference": "f4a04d2df710f81515df576b2de06bdeee518b83",
+                "url": "https://api.github.com/repos/symfony/translation/zipball/df36a48672b929bf3995eb62c58d83004b1d0d50",
+                "reference": "df36a48672b929bf3995eb62c58d83004b1d0d50",
                 "shasum": ""
             },
             "require": {
@@ -539,7 +489,7 @@
             ],
             "description": "Symfony Translation Component",
             "homepage": "https://symfony.com",
-            "time": "2017-04-12 14:13:17"
+            "time": "2017-06-24 16:45:17"
         }
     ],
     "packages-dev": [
@@ -986,20 +936,20 @@
         },
         {
             "name": "sebastian/diff",
-            "version": "dev-master",
+            "version": "1.4.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/diff.git",
-                "reference": "763d7adeb8c35d2af2b04c0f6cafeee059074dfb"
+                "reference": "7f066a26a962dbe58ddea9f72a4e82874a3975a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/763d7adeb8c35d2af2b04c0f6cafeee059074dfb",
-                "reference": "763d7adeb8c35d2af2b04c0f6cafeee059074dfb",
+                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/7f066a26a962dbe58ddea9f72a4e82874a3975a4",
+                "reference": "7f066a26a962dbe58ddea9f72a4e82874a3975a4",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.0"
+                "php": "^5.3.3 || ^7.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.0"
@@ -1034,7 +984,7 @@
             "keywords": [
                 "diff"
             ],
-            "time": "2017-03-07 07:26:53"
+            "time": "2017-05-22 07:24:03"
         },
         {
             "name": "sebastian/environment",

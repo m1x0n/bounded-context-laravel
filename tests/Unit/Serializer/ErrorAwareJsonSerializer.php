@@ -1,10 +1,10 @@
-<?php
+<?php namespace BoundedContext\Tests\Unit\Serializer;
 
 use BoundedContext\Laravel\Serializer\ErrorAwareJsonSerializer;
 use BoundedContext\Laravel\Serializer\JsonDeserializationException;
 use BoundedContext\Laravel\Serializer\JsonSerializationException;
 
-class ErrorAwareJsonSerializerTest extends PHPUnit_Framework_TestCase
+class ErrorAwareJsonSerializerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var ErrorAwareJsonSerializer
