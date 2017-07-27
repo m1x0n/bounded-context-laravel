@@ -1,6 +1,6 @@
-<?php
+<?php namespace BoundedContext\Tests\Unit\BoundedContext\Contracts\Generator;
 
-class DateTimeTest extends PHPUnit_Framework_TestCase
+class DateTimeTest extends \PHPUnit_Framework_TestCase
 {
     private $dateTime;
     private $currentTimezone;
@@ -8,9 +8,8 @@ class DateTimeTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->dateTime = New \BoundedContext\Laravel\Generator\DateTime();
         $this->currentTimezone = date_default_timezone_get();
-
+        $this->dateTime = New \BoundedContext\Laravel\Generator\DateTime();
     }
 
     /**
@@ -22,15 +21,15 @@ class DateTimeTest extends PHPUnit_Framework_TestCase
         $generated = $this->dateTime->generate();
         $timezone = (new \DateTime($generated->value()))->getTimezone();
 
-        $this->assertEquals($timezone->getName(), $offset);
+        $this->assertEquals($offset, $timezone->getName());
     }
 
     public function timezoneProvider()
     {
         return [
-            ['America/Los_Angeles', '-08:00'],
-            ['Europe/Dublin', '+00:00'],
-            ['Europe/Kiev', '+02:00'],
+            ['America/Los_Angeles', '-07:00'],
+            ['Europe/Dublin', '+01:00'],
+            ['Europe/Kiev', '+03:00'],
         ];
     }
 
