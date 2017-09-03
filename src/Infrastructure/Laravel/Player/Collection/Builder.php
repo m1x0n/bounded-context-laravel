@@ -1,6 +1,7 @@
 <?php namespace BoundedContext\Laravel\Player\Collection;
 
 use BoundedContext\Collection\Collection;
+use BoundedContext\Contracts\Player\Progress;
 use BoundedContext\Player\Collection\Player;
 use BoundedContext\Player\Repository;
 use BoundedContext\Player\Snapshot\ClassName;
@@ -11,12 +12,17 @@ class Builder
     protected $repository;
     protected $players;
     protected $config;
+    protected $progress;
 
-    public function __construct(Repository $repository, RegisteredList $list)
-    {
+    public function __construct(
+        Repository $repository,
+        RegisteredList $list,
+        Progress $progress
+    ) {
         $this->repository = $repository;
         $this->players = new Collection();
         $this->config = $list->all();
+        $this->progress = $progress;
     }
 
     public function all()
@@ -86,7 +92,8 @@ class Builder
     {
         return new Player(
             $this->repository,
-            $this->players
+            $this->players,
+            $this->progress
         );
     }
 }

@@ -3,6 +3,8 @@
 use BoundedContext\Laravel\Player\RegisteredList;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class BoundedContextProvider extends ServiceProvider
 {
@@ -235,6 +237,13 @@ class BoundedContextProvider extends ServiceProvider
         $this->app->bind(
             \BoundedContext\Contracts\Event\Snapshot\Transformer::class,
                 \BoundedContext\Event\Snapshot\Transformer::class
+        );
+
+        $this->app->bind(
+            \BoundedContext\Contracts\Player\Progress::class,
+            function() {
+                return new ProgressBar(new ConsoleOutput());
+            }
         );
     }
 }
